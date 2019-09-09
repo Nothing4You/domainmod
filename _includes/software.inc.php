@@ -24,6 +24,7 @@ define('SOFTWARE_TITLE', 'DomainMOD');
 define('SOFTWARE_VERSION', '4.13.0');
 define('WEB_ROOT', $web_root);
 define('DB_HOSTNAME', $dbhostname);
+define('DB_PORT', $dbport);
 define('DB_NAME', $dbname);
 define('DB_USERNAME', $dbusername);
 define('DB_PASSWORD', $dbpassword);

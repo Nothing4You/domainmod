@@ -25,6 +25,7 @@ $web_root = '/dm'; // don't include trailing slash (if you're installing in the 
 
 // Database Settings
 $dbhostname = 'localhost';
+$dbport = 3306;
 $dbname = 'db_name';
 $dbusername = 'db_username';
 $dbpassword = 'dbPassword123';
