@@ -29,3 +29,5 @@ $dbport = 3306;
 $dbname = 'db_name';
 $dbusername = 'db_username';
 $dbpassword = 'dbPassword123';
+
+$currency_converter_api_key = '';

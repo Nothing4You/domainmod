@@ -28,3 +28,4 @@ define('DB_PORT', $dbport);
 define('DB_NAME', $dbname);
 define('DB_USERNAME', $dbusername);
 define('DB_PASSWORD', $dbpassword);
+define('CURRENCY_CONVERTER_API_KEY', $currency_converter_api_key);

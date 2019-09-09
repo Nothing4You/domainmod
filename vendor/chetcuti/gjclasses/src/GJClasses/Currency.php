@@ -31,7 +31,7 @@ class Currency
         } elseif ($this->source === 'fcca') {
 
             $currency_slug = $from_currency . '_' . $to_currency;
-            $full_url = 'https://free.currencyconverterapi.com/api/v5/convert?q=' . $currency_slug . '&compact=y';
+            $full_url = 'https://free.currconv.com/api/v7/convert?q=' . $currency_slug . '&compact=y&apiKey=' . CURRENCY_CONVERTER_API_KEY;
             $remote = new Remote();
             $result = $remote->getFileContents($full_url);
             if ($result === false || $result === '{}') return false;
