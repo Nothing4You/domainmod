@@ -3,7 +3,7 @@
  * /settings/password/index.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -31,6 +31,7 @@ $system = new DomainMOD\System();
 $layout = new DomainMOD\Layout();
 $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
+$user = new DomainMOD\User();
 $sanitize = new DomainMOD\Sanitize();
 $unsanitize = new DomainMOD\Unsanitize();
 
@@ -44,9 +45,7 @@ $pdo = $deeb->cnxx;
 $new_password = $sanitize->text($_POST['new_password']);
 $new_password_confirmation = $sanitize->text($_POST['new_password_confirmation']);
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_password != "" && $new_password_confirmation != "" &&
-    $new_password == $new_password_confirmation
-) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_password != "" && $new_password_confirmation != "" && $new_password == $new_password_confirmation) {
 
     $stmt = $pdo->prepare("
         SELECT id
@@ -70,26 +69,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_password != "" && $new_password
 
     if (!$result || $user_count > 1) {
 
-        $_SESSION['s_message_danger'] .= "Your password could not be updated<BR>";
-        $_SESSION['s_message_danger'] .= "If the problem persists please contact your administrator<BR>";
+        $_SESSION['s_message_danger'] .= _('Your password could not be updated') . '<BR>';
+        $_SESSION['s_message_danger'] .= _('If the problem persists please contact your administrator') . '<BR>';
 
     } else {
 
+        $temp_password = $unsanitize->text($new_password);
+        $temp_hash = $user->generateHash($temp_password);
+
         $stmt = $pdo->prepare("
             UPDATE users
-            SET `password` = password(:new_password),
+            SET `password` = :temp_hash,
                 new_password = '0',
                 update_time = :timestamp
             WHERE id = :user_id
               AND email_address = :email_address");
-        $stmt->bindValue('new_password', $new_password, PDO::PARAM_STR);
+        $stmt->bindValue('temp_hash', $temp_hash, PDO::PARAM_STR);
         $timestamp = $time->stamp();
         $stmt->bindValue('timestamp', $timestamp, PDO::PARAM_STR);
         $stmt->bindValue('user_id', $_SESSION['s_user_id'], PDO::PARAM_INT);
         $stmt->bindValue('email_address', $_SESSION['s_email_address'], PDO::PARAM_STR);
         $stmt->execute();
 
-        $_SESSION['s_message_success'] .= "Password changed<BR>";
+        $_SESSION['s_message_success'] .= _('Password changed') . '<BR>';
 
         if ($_SESSION['s_running_login_checks'] == '1') {
 
@@ -111,11 +113,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_password != "" && $new_password
 
         if ($new_password == "" && $new_password_confirmation == "") {
 
-            $_SESSION['s_message_danger'] .= "Your passwords were left blank<BR>";
+            $_SESSION['s_message_danger'] .= _('Your passwords were left blank') . '<BR>';
 
         } else {
 
-            $_SESSION['s_message_danger'] .= "Your passwords didn't match<BR>";
+            $_SESSION['s_message_danger'] .= _("Your passwords didn't match") . '<BR>';
 
         }
 
@@ -128,14 +130,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_password != "" && $new_password
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 
 <?php
 echo $form->showFormTop('');
-echo $form->showInputText('new_password', 'New Password (255)', '', '', '255', '1', '1', '', '');
-echo $form->showInputText('new_password_confirmation', 'Confirm New Password', '', '', '255', '1', '1', '', '');
-echo $form->showSubmitButton('Change Password', '', '');
+echo $form->showInputText('new_password', _('New Password') . ' (72)', '', '', '72', '1', '1', '', '');
+echo $form->showInputText('new_password_confirmation', _('Confirm New Password') . ' (72)', '', '', '72', '1', '1', '', '');
+echo $form->showSubmitButton(_('Change Password'), '', '');
 echo $form->showFormBottom('');
 ?>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>

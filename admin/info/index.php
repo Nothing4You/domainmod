@@ -3,7 +3,7 @@
  * /admin/info/index.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -44,23 +44,27 @@ $pdo = $deeb->cnxx;
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<!body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 
-<strong><?php echo SOFTWARE_TITLE; ?> Version:</strong> <?php echo SOFTWARE_VERSION; ?> (<em><?php echo $_SESSION['s_system_db_version']; ?></em>)<BR>
-<strong>Local IP Address:</strong> <?php echo $_SERVER['SERVER_ADDR']; ?><BR>
-<strong>Remote IP Address:</strong> <?php echo $system->getIpRemotely(); ?><BR>
-<strong>Web Server OS:</strong> <?php echo php_uname(); ?><BR>
-<strong>Web Server Software:</strong> <?php echo $_SERVER['SERVER_SOFTWARE']; ?><BR>
-<strong>PHP Version:</strong> <?php echo phpversion(); ?><BR>
-<strong>PHP Error Log Location:</strong> <?php echo ini_get('error_log'); ?><BR>
-<strong>MySQL Version:</strong> <?php echo $pdo->query('select version()')->fetchColumn(); ?><BR>
-<strong>MySQL Mode:</strong> <?php echo $pdo->query('select @@sql_mode')->fetchColumn(); ?><BR>
+<strong><?php echo SOFTWARE_TITLE; ?> <?php echo _('Version'); ?>:</strong> <?php echo SOFTWARE_VERSION; ?> (<em><?php echo $_SESSION['s_system_db_version']; ?></em>)<BR>
+<strong><?php echo _('Local IP Address'); ?>:</strong> <?php echo $_SERVER['SERVER_ADDR']; ?><BR>
+<strong><?php echo _('Remote IP Address'); ?>:</strong> <?php echo $system->getIpRemotely(); ?><BR>
+<strong><?php echo _('Web Server OS'); ?>:</strong> <?php echo php_uname(); ?><BR>
+<strong><?php echo _('Web Server Software'); ?>:</strong> <?php echo $_SERVER['SERVER_SOFTWARE']; ?><BR>
+<strong><?php echo _('PHP Version'); ?>:</strong> <?php echo phpversion(); ?><BR>
+<strong><?php echo _('PHP Error Log Location'); ?>:</strong> <?php echo ini_get('error_log'); ?><BR>
+<strong><?php echo _('MySQL Version'); ?>:</strong> <?php echo $pdo->query('select version()')->fetchColumn(); ?><BR>
+<strong><?php echo _('MySQL Mode'); ?>:</strong> <?php echo $pdo->query('select @@sql_mode')->fetchColumn(); ?><BR>
 <BR>
 <?php
 list($null, $requirements, $null) = $system->getRequirements();
 echo $requirements;
 ?>
+
+
+
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
 </body>
 </html>

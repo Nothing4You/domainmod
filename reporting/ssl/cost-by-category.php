@@ -3,7 +3,7 @@
  * /reporting/ssl/cost-by-category.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -34,6 +34,8 @@ $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
 $reporting = new DomainMOD\Reporting();
 $currency = new DomainMOD\Currency();
+$sanitize = new DomainMOD\Sanitize();
+$unsanitize = new DomainMOD\Unsanitize();
 
 require_once DIR_INC . '/head.inc.php';
 require_once DIR_INC . '/debug.inc.php';
@@ -43,7 +45,7 @@ $system->authCheck();
 $pdo = $deeb->cnxx;
 
 $export_data = (int) $_GET['export_data'];
-$daterange = $_REQUEST['daterange'];
+$daterange = $sanitize->text($_REQUEST['daterange']);
 
 list($new_start_date, $new_end_date) = $date->splitAndCheckRange($daterange);
 
@@ -53,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($new_start_date > $new_end_date) {
 
-        $_SESSION['s_message_danger'] .= 'The end date proceeds the start date<BR>';
+        $_SESSION['s_message_danger'] .= _('The end date proceeds the start date') . '<BR>';
         $submission_failed = '1';
 
     }
@@ -71,7 +73,7 @@ $result = $pdo->query("
       AND sslc.cat_id = cat.id
       AND sslc.active NOT IN ('0')
       AND cc.user_id = '" . $_SESSION['s_user_id'] . "'" .
-      $range_string . "
+    $range_string . "
     GROUP BY cat.name
     ORDER BY cat.name")->fetchAll();
 
@@ -86,7 +88,7 @@ $result_grand_total = $pdo->query("
       AND sslc.cat_id = cat.id
       AND sslc.active NOT IN ('0')
       AND cc.user_id = '" . $_SESSION['s_user_id'] . "'" .
-      $range_string)->fetchAll();
+    $range_string)->fetchAll();
 
 foreach ($result_grand_total as $row_grand_total) {
 
@@ -106,12 +108,12 @@ if ($submission_failed != '1' && $total_rows > 0) {
 
         if ($daterange == '') {
 
-            $export_file = $export->openFile('ssl_cost_by_category_report_all', strtotime($time->stamp()));
+            $export_file = $export->openFile(_('ssl_cost_by_category_report_all'), strtotime($time->stamp()));
 
         } else {
 
             $export_file = $export->openFile(
-                'ssl_cost_by_category_report',
+                _('ssl_cost_by_category_report'),
                 $new_start_date . '--' . $new_end_date
             );
 
@@ -124,24 +126,24 @@ if ($submission_failed != '1' && $total_rows > 0) {
 
         if ($daterange == '') {
 
-            $row_contents = array('Date Range:', 'ALL');
+            $row_contents = array(_('Date Range') . ':', strtoupper(_('All')));
 
         } else {
 
-            $row_contents = array('Date Range:', $daterange);
+            $row_contents = array(_('Date Range') . ':', $daterange);
 
         }
         $export->writeRow($export_file, $row_contents);
 
         $row_contents = array(
-            'Total Cost:',
+            _('Total Cost') . ':',
             $grand_total,
             $_SESSION['s_default_currency']
         );
         $export->writeRow($export_file, $row_contents);
 
         $row_contents = array(
-            'Number of SSL Certs:',
+            _('Number of SSL Certs') . ':',
             $number_of_certs_total
         );
         $export->writeRow($export_file, $row_contents);
@@ -149,10 +151,10 @@ if ($submission_failed != '1' && $total_rows > 0) {
         $export->writeBlankRow($export_file);
 
         $row_contents = array(
-            'Category',
-            'Cost',
-            'SSL Certs',
-            'Per Cert'
+            _('Category'),
+            _('Cost'),
+            _('SSL Certs'),
+            _('Per Cert')
         );
         $export->writeRow($export_file, $row_contents);
 
@@ -194,7 +196,7 @@ if ($submission_failed != '1' && $total_rows > 0) {
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
     <?php require_once DIR_INC . '/layout/date-range-picker-head.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php require_once DIR_INC . '/layout/reporting-block.inc.php'; ?>
 <?php
@@ -202,42 +204,42 @@ if ($submission_failed != '1' && $total_rows > 0) { ?>
 
     <?php require_once DIR_INC . '/layout/reporting-block-sub.inc.php'; ?>
 
-    <table id="<?php echo $slug; ?>" class="<?php echo $datatable_class; ?>">
-        <thead>
+<table id="<?php echo $slug; ?>" class="<?php echo $datatable_class; ?>">
+    <thead>
+    <tr>
+        <th width="20px"></th>
+        <th><?php echo _('Category'); ?></th>
+        <th><?php echo _('Cost'); ?></th>
+        <th><?php echo _('SSL Certs'); ?></th>
+        <th><?php echo _('Per Cert'); ?></th>
+    </tr>
+    </thead>
+    <tbody><?php
+
+    foreach ($result as $row) {
+
+        $per_cert = $row->total_cost / $row->number_of_certs;
+
+        $per_cert = $currency->format($per_cert, $_SESSION['s_default_currency_symbol'], $_SESSION['s_default_currency_symbol_order'], $_SESSION['s_default_currency_symbol_space']);
+
+        $row->total_cost = $currency->format($row->total_cost, $_SESSION['s_default_currency_symbol'], $_SESSION['s_default_currency_symbol_order'], $_SESSION['s_default_currency_symbol_space']); ?>
+
         <tr>
-            <th width="20px"></th>
-            <th>Category</th>
-            <th>Cost</th>
-            <th>SSL Certs</th>
-            <th>Per Cert</th>
-        </tr>
-        </thead>
-        <tbody><?php
+        <td></td>
+        <td><?php echo $row->name; ?></td>
+        <td><?php echo $row->total_cost; ?></td>
+        <td><a href="../../ssl/index.php?sslpcid=<?php echo $row->id; ?>"><?php echo $row->number_of_certs; ?></a></td>
+        <td><?php echo $per_cert; ?></td>
+        </tr><?php
 
-        foreach ($result as $row) {
+    } ?>
 
-            $per_cert = $row->total_cost / $row->number_of_certs;
-
-            $per_cert = $currency->format($per_cert, $_SESSION['s_default_currency_symbol'], $_SESSION['s_default_currency_symbol_order'], $_SESSION['s_default_currency_symbol_space']);
-
-            $row->total_cost = $currency->format($row->total_cost, $_SESSION['s_default_currency_symbol'], $_SESSION['s_default_currency_symbol_order'], $_SESSION['s_default_currency_symbol_space']); ?>
-
-            <tr>
-                <td></td>
-                <td><?php echo $row->name; ?></td>
-                <td><?php echo $row->total_cost; ?></td>
-                <td><a href="../../ssl/index.php?sslpcid=<?php echo $row->id; ?>"><?php echo $row->number_of_certs; ?></a></td>
-                <td><?php echo $per_cert; ?></td>
-            </tr><?php
-
-        } ?>
-
-        </tbody>
+    </tbody>
     </table><?php
 
 } else {
 
-    echo 'No results.<BR><BR>';
+    echo _('No results.') . '<BR>';
 
 }
 ?>

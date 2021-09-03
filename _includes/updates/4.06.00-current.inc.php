@@ -3,7 +3,7 @@
  * /_includes/updates/4.06.00-current.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -1216,6 +1216,228 @@ if ($current_db_version === '4.12.0') {
         $pdo->query("
             ALTER TABLE `settings`
             ADD `currency_converter` VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'fcca' AFTER `expiration_days`");
+
+        $upgrade->database($new_version);
+
+        $pdo->commit();
+        $current_db_version = $new_version;
+
+    } catch (Exception $e) {
+
+        $pdo->rollback();
+        $upgrade->logFailedUpgrade($old_version, $new_version, $e);
+        throw $e;
+
+    }
+
+}
+
+// upgrade database from 4.13.0 to 4.14.0
+if ($current_db_version === '4.13.0') {
+
+    $old_version = '4.13.0';
+    $new_version = '4.14.0';
+
+    try {
+
+        $pdo->beginTransaction();
+
+        $pdo->query("
+            ALTER TABLE `settings`
+            CHANGE `currency_converter` `currency_converter` VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'era'");
+
+        $pdo->query("
+            UPDATE `settings`
+            SET currency_converter = 'era'");
+
+        $pdo->query("
+            ALTER TABLE `settings`
+            ADD `email_signature` INT(10) UNSIGNED NOT NULL DEFAULT '1' AFTER `expiration_days`");
+
+        $upgrade->database($new_version);
+
+        $pdo->commit();
+        $current_db_version = $new_version;
+
+    } catch (Exception $e) {
+
+        $pdo->rollback();
+        $upgrade->logFailedUpgrade($old_version, $new_version, $e);
+        throw $e;
+
+    }
+
+}
+
+// upgrade database from 4.14.0 to 4.15.0
+if ($current_db_version === '4.14.0') {
+
+    $old_version = '4.14.0';
+    $new_version = '4.15.0';
+
+    try {
+
+        $pdo->beginTransaction();
+
+        $pdo->query("UPDATE registrars SET name = 'n/a' WHERE name = '' OR name IS NULL");
+        $pdo->query("UPDATE registrar_accounts SET username = 'n/a' WHERE username = '' OR username IS NULL");
+        $pdo->query("UPDATE dns SET name = 'n/a' WHERE name = '' OR name IS NULL");
+        $pdo->query("UPDATE dns SET dns1 = 'n/a' WHERE dns1 = '' OR dns1 IS NULL");
+        $pdo->query("UPDATE dns SET dns2 = 'n/a' WHERE dns2 = '' OR dns2 IS NULL");
+        $pdo->query("UPDATE hosting SET name = 'n/a' WHERE name = '' OR name IS NULL");
+        $pdo->query("UPDATE ssl_providers SET name = 'n/a' WHERE name = '' OR name IS NULL");
+        $pdo->query("UPDATE ssl_accounts SET username = 'n/a' WHERE username = '' OR username IS NULL");
+        $pdo->query("UPDATE ssl_cert_types SET type = 'n/a' WHERE type = '' OR type IS NULL");
+        $pdo->query("UPDATE owners SET name = 'n/a' WHERE name = '' OR name IS NULL");
+        $pdo->query("UPDATE categories SET name = 'n/a' WHERE name = '' OR name IS NULL");
+        $pdo->query("UPDATE ip_addresses SET name = 'n/a' WHERE name = '' OR name IS NULL");
+        $pdo->query("UPDATE ip_addresses SET ip = 'n/a' WHERE ip = '' OR ip IS NULL");
+
+        $pdo->query("
+            INSERT INTO `api_registrars`
+            (`name`, req_account_username, req_account_password, req_reseller_id, req_api_app_name, req_api_key,
+             req_api_secret, req_ip_address, lists_domains, ret_expiry_date, ret_dns_servers, ret_privacy_status,
+             ret_autorenewal_status, notes, insert_time)
+             VALUES
+            ('Gandi', '0', '0', '0', '0', '1', '0', '0', '1', '1', '1', '0', '1', 'Gandi does not currently allow the WHOIS privacy status of a domain to be retrieved via their API, so all domains added to the Domain Queue from a Gandi account will have their WHOIS privacy status set to No by default.', '" . $timestamp . "')");
+
+        $upgrade->database($new_version);
+
+        $pdo->commit();
+        $current_db_version = $new_version;
+
+    } catch (Exception $e) {
+
+        $pdo->rollback();
+        $upgrade->logFailedUpgrade($old_version, $new_version, $e);
+        throw $e;
+
+    }
+
+}
+
+// upgrade database from 4.15.0 to 4.16.0
+if ($current_db_version === '4.15.0') {
+
+    $old_version = '4.15.0';
+    $new_version = '4.16.0';
+
+    try {
+
+        $pdo->beginTransaction();
+
+        $pdo->query("
+            CREATE TABLE IF NOT EXISTS `languages` (
+                `id` INT(5) UNSIGNED NOT NULL AUTO_INCREMENT,
+                `name` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+                `language` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+                `insert_time` DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',
+                PRIMARY KEY  (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1");
+
+        $pdo->query("
+            INSERT INTO `languages`
+            (`name`, language, insert_time)
+             VALUES
+            ('English (Canada)', 'en_CA.UTF-8', '" . $timestamp . "'),
+            ('English (United States)', 'en_US.UTF-8', '" . $timestamp . "'),
+            ('German', 'de_DE.UTF-8', '" . $timestamp . "'),
+            ('Spanish', 'es_ES.UTF-8', '" . $timestamp . "'),
+            ('French', 'fr_FR.UTF-8', '" . $timestamp . "'),
+            ('Italian', 'it_IT.UTF-8', '" . $timestamp . "'),
+            ('Dutch', 'nl_NL.UTF-8', '" . $timestamp . "'),
+            ('Polish', 'pl_PL.UTF-8', '" . $timestamp . "'),
+            ('Portuguese', 'pt_PT.UTF-8', '" . $timestamp . "'),
+            ('Russian', 'ru_RU.UTF-8', '" . $timestamp . "')");
+
+        $pdo->query("
+            ALTER TABLE `user_settings`
+            ADD `default_language` VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'en_US.UTF-8' AFTER `user_id`");
+
+        $upgrade->database($new_version);
+
+        $pdo->commit();
+        $current_db_version = $new_version;
+
+    } catch (Exception $e) {
+
+        $pdo->rollback();
+        $upgrade->logFailedUpgrade($old_version, $new_version, $e);
+        throw $e;
+
+    }
+
+} //@formatter:on
+
+// upgrade database from 4.16.0 to 4.17.0
+if ($current_db_version === '4.16.0') {
+
+    $old_version = '4.16.0';
+    $new_version = '4.17.0';
+
+    try {
+
+        $pdo->beginTransaction();
+
+        $pdo->query("
+            INSERT INTO custom_field_types
+            (id, `name`, insert_time)
+            VALUES
+            (6, 'URL', '" . $timestamp . "')");
+
+        $upgrade->database($new_version);
+
+        $pdo->commit();
+        $current_db_version = $new_version;
+
+    } catch (Exception $e) {
+
+        $pdo->rollback();
+        $upgrade->logFailedUpgrade($old_version, $new_version, $e);
+        throw $e;
+
+    }
+
+} //@formatter:on
+
+// upgrade database from 4.17.0 to 4.18.0
+if ($current_db_version === '4.17.0') {
+
+    $old_version = '4.17.0';
+    $new_version = '4.18.0';
+
+    try {
+
+        $pdo->beginTransaction();
+
+        $pdo->query("
+            ALTER TABLE `user_settings`
+            ADD `dark_mode` TINYINT(1) NOT NULL DEFAULT '0' AFTER `display_dw_intro_page`");
+
+        $upgrade->database($new_version);
+
+        $pdo->commit();
+        $current_db_version = $new_version;
+
+    } catch (Exception $e) {
+
+        $pdo->rollback();
+        $upgrade->logFailedUpgrade($old_version, $new_version, $e);
+        throw $e;
+
+    }
+
+} //@formatter:on
+
+// upgrade database from 4.18.0 to 4.18.01
+if ($current_db_version === '4.18.0') {
+
+    $old_version = '4.18.0';
+    $new_version = '4.18.01';
+
+    try {
+
+        $pdo->beginTransaction();
 
         /*
          * This needs to be MOVED from the last version to the newest version with every release

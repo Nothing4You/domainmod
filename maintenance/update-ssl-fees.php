@@ -3,7 +3,7 @@
  * /maintenance/update-ssl-fees.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -44,7 +44,7 @@ $queryB = new DomainMOD\QueryBuild();
 $sql = $queryB->missingFees('ssl_certs');
 $_SESSION['s_missing_ssl_fees'] = $system->checkForRows($sql);
 
-$_SESSION['s_message_success'] .= "SSL Certificate Fees updated<BR>";
+$_SESSION['s_message_success'] .= _('SSL Certificate Fees updated') . '<BR>';
 
 header("Location: index.php");
 exit;

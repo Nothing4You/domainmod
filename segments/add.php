@@ -3,7 +3,7 @@
  * /segments/add.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -69,23 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if ($invalid_count == 1) {
 
-                    $_SESSION['s_message_danger'] .= "There is " . number_format($invalid_count) . " invalid domain
-                        on your list<BR><BR>" . $temp_result_message;
+                    $_SESSION['s_message_danger'] .= sprintf(_('There is %s invalid domain on your list'), number_format($invalid_count)) . '<BR><BR>' . $temp_result_message;
 
                 } else {
 
-                    $_SESSION['s_message_danger'] .= "There are " . number_format($invalid_count) . " invalid
-                        domains on your list<BR><BR>" . $temp_result_message;
+                    $_SESSION['s_message_danger'] .= sprintf(_('There are %s invalid domains on your list'), number_format($invalid_count)) . '<BR><BR>' . $temp_result_message;
 
                     if (($invalid_count - $invalid_to_display) == 1) {
 
-                        $_SESSION['s_message_danger'] .= "<BR>Plus " .
-                            number_format($invalid_count - $invalid_to_display) . " other<BR>";
+                        $_SESSION['s_message_danger'] .= '<BR>' . sprintf(_('Plus %s other'), number_format($invalid_count - $invalid_to_display)) . '<BR>';
 
                     } elseif (($invalid_count - $invalid_to_display) > 1) {
 
-                        $_SESSION['s_message_danger'] .= "<BR>Plus " .
-                            number_format($invalid_count - $invalid_to_display) . " others<BR>";
+                        $_SESSION['s_message_danger'] .= '<BR>' . sprintf(_('Plus %s others'), number_format($invalid_count - $invalid_to_display)) . '<BR>';
+
                     }
 
                 }
@@ -106,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 foreach ($domain_array as $key => $new_domain) {
 
                     if (!$domain->checkFormat($new_domain)) {
-                        echo 'invalid domain ' . $key;
+                        echo _('invalid domain') . ' ' . $key;
                         exit;
                     }
 
@@ -132,12 +129,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $temp_segment_id = $pdo->lastInsertId('id');
 
                 $stmt = $pdo->prepare("
-                    DELETE FROM segment_data
-                    WHERE segment_id = :temp_segment_id");
-                $stmt->bindValue('temp_segment_id', $temp_segment_id, PDO::PARAM_INT);
-                $stmt->execute();
-
-                $stmt = $pdo->prepare("
                     INSERT INTO segment_data
                     (segment_id, domain, insert_time)
                     VALUES
@@ -156,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 $pdo->commit();
 
-                $_SESSION['s_message_success'] .= "Segment " . $new_name . " Added<BR>";
+                $_SESSION['s_message_success'] .= sprintf(_('Segment %s added'), $new_name) . '<BR>';
 
                 header("Location: ../segments/");
                 exit;
@@ -180,10 +171,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
 
         if ($new_name == "") {
-            $_SESSION['s_message_danger'] .= "Enter the segment name<BR>";
+            $_SESSION['s_message_danger'] .= _('Enter the Segment name') . '<BR>';
         }
         if ($raw_domain_list == "") {
-            $_SESSION['s_message_danger'] .= "Enter the segment<BR>";
+            $_SESSION['s_message_danger'] .= _('Enter the Segment') . '<BR>';
         }
 
     }
@@ -196,15 +187,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 echo $form->showFormTop('');
-echo $form->showInputText('new_name', 'Segment Name (35)', '', $unsanitize->text($new_name), '35', '', '1', '', '');
-echo $form->showInputTextarea('raw_domain_list', 'Segment Domains (one per line)', '', $unsanitize->text($raw_domain_list), '1', '', '');
-echo $form->showInputTextarea('new_description', 'Description', '', $unsanitize->text($new_description), '', '', '');
-echo $form->showInputTextarea('new_notes', 'Notes', '', $unsanitize->text($new_notes), '', '', '');
-echo $form->showSubmitButton('Add Segment', '', '');
+echo $form->showInputText('new_name', _('Segment Name') . ' (35)', '', $unsanitize->text($new_name), '35', '', '1', '', '');
+echo $form->showInputTextarea('raw_domain_list', _('Segment Domains (one per line)'), '', $unsanitize->text($raw_domain_list), '1', '', '');
+echo $form->showInputTextarea('new_description', _('Description'), '', $unsanitize->text($new_description), '', '', '');
+echo $form->showInputTextarea('new_notes', _('Notes'), '', $unsanitize->text($new_notes), '', '', '');
+echo $form->showSubmitButton(_('Add Segment'), '', '');
 echo $form->showFormBottom('');
 ?>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>

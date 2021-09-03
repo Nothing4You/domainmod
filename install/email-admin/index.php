@@ -3,7 +3,7 @@
  * /install/email-admin/index.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -48,18 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $_SESSION['new_admin_email'] = $new_admin_email1;
 
-        header("Location: ../go.php");
+        header("Location: ../email-system/");
         exit;
 
     } else {
 
         if ($new_admin_email1 === '' && $new_admin_email2 === '') {
 
-            $_SESSION['s_message_danger'] .= "Please enter and confirm the adminstrator email address<BR>";
+            $_SESSION['s_message_danger'] .= _('Please enter and confirm the administrator email address') . '<BR>';
 
         } else {
 
-            $_SESSION['s_message_danger'] .= "The administrator email addresses didn't match<BR>";
+            $_SESSION['s_message_danger'] .= _("The administrator email addresses didn't match") . '<BR>';
 
         }
 
@@ -78,18 +78,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } ?>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red" onLoad="document.forms[0].elements[0].focus()">
+<body class="hold-transition text-sm">
 <?php require_once DIR_INC . '/layout/header-install.inc.php'; ?>
-This email address will be used for the first administrator account, which will be created during the installation process.<BR>
+<?php echo _('This email address will be used for the first administrator account, which will be created during the installation process.'); ?><BR>
 <BR>
 <?php
 echo $form->showFormTop('');
-echo $form->showInputText('new_admin_email1', 'Enter Email', '', $unsanitize->text($new_admin_email1), '100', '', '', '', '');
-echo $form->showInputText('new_admin_email2', 'Confirm Email', '', $unsanitize->text($new_admin_email2), '100', '', '', '', '');
+echo $form->showInputText('new_admin_email1', _('Enter Email'), '', $unsanitize->text($new_admin_email1), '100', '', '', '', '');
+echo $form->showInputText('new_admin_email2', _('Confirm Email'), '', $unsanitize->text($new_admin_email2), '100', '', '', '', '');
 ?>
-<a href="../email-system/"><?php echo $layout->showButton('button', 'Go Back'); ?></a>
+<a href="../timezone/"><?php echo $layout->showButton('button', _('Go Back')); ?></a>
 <?php
-echo $form->showSubmitButton('Begin Installation', '', '');
+echo $form->showSubmitButton(_('Next Step'), '', '');
 echo $form->showFormBottom('');
 ?>
 <?php require_once DIR_INC . '/layout/footer-install.inc.php'; ?>

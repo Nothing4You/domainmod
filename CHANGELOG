@@ -1,5 +1,66 @@
 DomainMOD CHANGELOG
 ===================
+v4.18.01    2021-07-25
+- Updated Force HTTPS to default to No
+
+v4.18.0    2021-07-22
+- Added Dark Mode
+- Added Feedback page
+- Added a strong Content Security Policy
+- Added the ability to disable the CSP headers
+- Added ssl.php Helper
+- Upgraded AdminLTE from v2.4.5 to v3.1.0
+- Improved session security on password change
+- Various UI updates and improvements
+
+v4.17.0    2021-06-26
+- Added URL Custom Field Type
+- Added exchangerate.host currency conversion support
+- Added numerous security measures
+  - Enabled X-Content-Type-Options nosniff for security
+  - Enabled X-XSS-Protection header to help prevent XSS
+  - Enabled session.cookie_httponly for security
+  - Cast some variables as integers for XSS protection
+  - Implemented anti-frame HTTP headers
+  - Updated $segid to be cast as integer for security
+  - Disabled autocomplete for password fields
+- Updated translations
+- Updated Composer packages
+- Code cleanup
+
+v4.16.0    2020-11-02
+- Added multilingual support
+
+v4.15.0    2020-05-17
+- Added Gandi API support
+- Added support for more than 100 domains with Namecheap API
+- Added some text validation to Asset pages
+- Added GitHub "Stale" App
+- Changed PHP requirement from 5.3.2 to 5.5
+- Fixed domain sanitization for IDN compatibility
+- Fixed Integrity constraint violation error
+- Fixed SSL keyword search
+- Fixed unbuffered query issue (again)
+- Sanitized SSL keyword search
+- Reverted some identical operators
+- Removed Scrutinizer-CI badges from README
+- Code cleanup
+
+v4.14.0    2020-05-10
+- Added Backup & Restore
+- Added the ability to change the email signature
+- Updated Name.com API to v4
+- Changed delete links to modals
+- Switched password hashing from MD5 to bcrypt
+- Removed Free Currency Converter API
+- Upgraded Composer
+- Upgraded GJClasses (0.27.0 -> 0.29.0)
+- Upgraded PHPMailer (5.2.27 -> 5.2.28)
+- Installed mysql-import (1.0.1)
+- Installed uploader (0.1.8)
+- Installed mysqldump-php (2.9)
+- Fixed various vulnerabilities (including CVE-2019-15811)
+
 v4.13.0    2019-02-09
 - Added Custom Domain Fields to main Domains page
 - Added Custom SSL Fields to main SSL page

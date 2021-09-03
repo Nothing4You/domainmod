@@ -3,7 +3,7 @@
  * /assets/edit/registrar-fee.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $pdo->commit();
 
-        $_SESSION['s_message_success'] .= "The fee for ." . $new_tld . " has been updated<BR>";
+        $_SESSION['s_message_success'] .= sprintf(_('The fee for %s has been updated'), $new_tld) . '<BR>';
 
         header("Location: ../registrar-fees.php?rid=" . $rid);
         exit;
@@ -172,23 +172,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
-<a href="../registrar-fees.php?rid=<?php echo $rid; ?>"><?php echo $layout->showButton('button', 'Back to Registrar Fees'); ?></a><BR><BR>
+<a href="../registrar-fees.php?rid=<?php echo $rid; ?>"><?php echo $layout->showButton('button', _('Back to Registrar Fees')); ?></a><BR><BR>
 <?php
 echo $form->showFormTop('');
 $temp_registrar = $assets->getRegistrar($rid);
 ?>
-<strong>Domain Registrar</strong><BR>
+<strong><?php echo _('Domain Registrar'); ?></strong><BR>
 <?php echo $temp_registrar; ?><BR><BR>
-<strong>TLD</strong><BR>
+<strong><?php echo _('TLD'); ?></strong><BR>
 <?php echo '.' . htmlentities($new_tld, ENT_QUOTES, 'UTF-8'); ?><BR><BR>
 <?php
-echo $form->showInputText('new_initial_fee', 'Initial Fee', '', $new_initial_fee, '10', '', '1', '', '');
-echo $form->showInputText('new_renewal_fee', 'Renewal Fee', '', $new_renewal_fee, '10', '', '1', '', '');
-echo $form->showInputText('new_transfer_fee', 'Transfer Fee', '', $new_transfer_fee, '10', '', '1', '', '');
-echo $form->showInputText('new_privacy_fee', 'Privacy Fee', '', $new_privacy_fee, '10', '', '', '', '');
-echo $form->showInputText('new_misc_fee', 'Misc Fee', '', $new_misc_fee, '10', '', '', '', '');
+echo $form->showInputText('new_initial_fee', _('Initial Fee'), '', $new_initial_fee, '10', '', '1', '', '');
+echo $form->showInputText('new_renewal_fee', _('Renewal Fee'), '', $new_renewal_fee, '10', '', '1', '', '');
+echo $form->showInputText('new_transfer_fee', _('Transfer Fee'), '', $new_transfer_fee, '10', '', '1', '', '');
+echo $form->showInputText('new_privacy_fee', _('Privacy Fee'), '', $new_privacy_fee, '10', '', '', '', '');
+echo $form->showInputText('new_misc_fee', _('Misc Fee'), '', $new_misc_fee, '10', '', '', '', '');
 
 $result = $pdo->query("
     SELECT id, currency, `name`, symbol
@@ -197,7 +197,7 @@ $result = $pdo->query("
 
 if ($result) {
 
-    echo $form->showDropdownTop('new_currency_id', 'Currency', '', '', '');
+    echo $form->showDropdownTop('new_currency_id', _('Currency'), '', '', '');
 
     foreach ($result as $row) {
 
@@ -212,7 +212,7 @@ if ($result) {
 echo $form->showInputHidden('fee_id', $fee_id);
 echo $form->showInputHidden('rid', $rid);
 echo $form->showInputHidden('new_tld', $new_tld);
-echo $form->showSubmitButton('Save', '', '');
+echo $form->showSubmitButton(_('Save'), '', '');
 echo $form->showFormBottom('');
 ?>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>

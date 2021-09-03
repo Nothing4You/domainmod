@@ -3,7 +3,7 @@
  * /admin/ssl-fields/edit.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -45,7 +45,6 @@ $system->checkAdminUser($_SESSION['s_is_admin']);
 $pdo = $deeb->cnxx;
 
 $del = (int) $_GET['del'];
-$really_del = (int) $_GET['really_del'];
 
 $csfid = (int) $_GET['csfid'];
 
@@ -66,7 +65,7 @@ $result = $stmt->fetchColumn();
 
 if (!$result) {
 
-    $_SESSION['s_message_danger'] .= "The Custom SSL Field you're trying to edit is invalid<BR>";
+    $_SESSION['s_message_danger'] .= _("The Custom SSL Field you're trying to edit is invalid") . '<BR>';
 
     header("Location: ../ssl-fields/");
     exit;
@@ -110,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_name != '') {
 
         $_SESSION['s_csf_data'] = $custom_field->getCSFData();
 
-        $_SESSION['s_message_success'] .= 'Custom SSL Field ' . $new_name . ' (' . $result . ') updated<BR>';
+        $_SESSION['s_message_success'] .= sprintf(_('Custom SSL Field %s (%s) updated'), $new_name, $result) . '<BR>';
 
         header("Location: ../ssl-fields/");
         exit;
@@ -133,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_name != '') {
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-        if ($new_name == '') $_SESSION['s_message_danger'] .= 'Enter the display name<BR>';
+        if ($new_name == '') $_SESSION['s_message_danger'] .= _('Enter the display name') . '<BR>';
 
     } else {
 
@@ -164,15 +163,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_name != '') {
 
 if ($del === 1) {
 
-    $_SESSION['s_message_danger'] .= 'Are you sure you want to delete this Custom SSL Field?<BR><BR><a href="edit.php?csfid=' . $csfid . '&really_del=1">YES, REALLY DELETE THIS CUSTOM SSL FIELD</a><BR>';
-
-}
-
-if ($really_del === 1) {
-
     if ($csfid === 0) {
 
-        $_SESSION['s_message_danger'] .= 'The Custom SSL Field cannot be deleted<BR>';
+        $_SESSION['s_message_danger'] .= _('The Custom SSL Field cannot be deleted') . '<BR>';
 
     } else {
 
@@ -211,7 +204,7 @@ if ($really_del === 1) {
 
             $_SESSION['s_csf_data'] = $custom_field->getCSFData();
 
-            $_SESSION['s_message_success'] .= 'Custom SSL Field ' . $result->name . ' (' . $result->field_name . ') deleted<BR>';
+            $_SESSION['s_message_success'] .= sprintf(_('Custom SSL Field %s (%s) deleted'), $result->name, $result->field_name) . '<BR>';
 
             header("Location: ../ssl-fields/");
             exit;
@@ -240,22 +233,23 @@ if ($really_del === 1) {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 echo $form->showFormTop('');
-echo $form->showInputText('new_name', 'Display Name (75)', '', $unsanitize->text($new_name), '75', '', '1', '', '');
+echo $form->showInputText('new_name', _('Display Name') . ' (75)', '', $unsanitize->text($new_name), '75', '', '1', '', '');
 ?>
-<strong>Database Field Name</strong><BR><?php echo $new_field_name; ?><BR><BR>
-<strong>Data Type</strong><BR><?php echo $new_field_type; ?><BR><BR>
+<strong><?php echo _('Database Field Name'); ?></strong><BR><?php echo $new_field_name; ?><BR><BR>
+<strong><?php echo _('Data Type'); ?></strong><BR><?php echo $new_field_type; ?><BR><BR>
 <?php
-echo $form->showInputText('new_description', 'Description (255)', '', $unsanitize->text($new_description), '255', '', '', '', '');
-echo $form->showInputTextarea('new_notes', 'Notes', '', $unsanitize->text($new_notes), '', '', '');
+echo $form->showInputText('new_description', _('Description') . ' (255)', '', $unsanitize->text($new_description), '255', '', '', '', '');
+echo $form->showInputTextarea('new_notes', _('Notes'), '', $unsanitize->text($new_notes), '', '', '');
 echo $form->showInputHidden('new_csfid', $csfid);
-echo $form->showSubmitButton('Save', '', '');
+echo $form->showSubmitButton(_('Save'), '', '');
 echo $form->showFormBottom('');
+
+$layout->deleteButton(_('Custom SSL Field'), $new_name, 'edit.php?csfid=' . $csfid . '&del=1');
 ?>
-<BR><a href="edit.php?csfid=<?php echo $csfid; ?>&del=1">DELETE THIS CUSTOM SSL FIELD</a>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; //@formatter:on ?>
 </body>
 </html>

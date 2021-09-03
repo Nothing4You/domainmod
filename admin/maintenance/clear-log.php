@@ -3,7 +3,7 @@
  * /admin/maintenance/clear-log.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -38,7 +38,7 @@ $pdo = $deeb->cnxx;
 
 $pdo->query("TRUNCATE log");
 
-$_SESSION['s_message_success'] .= 'Debug Log Cleared';
+$_SESSION['s_message_success'] .= _('Debug Log Cleared');
 
 header("Location: index.php");
 exit;

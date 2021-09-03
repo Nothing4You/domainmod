@@ -3,7 +3,7 @@
  * /settings/index.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -41,12 +41,12 @@ $system->authCheck();
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
-<a href="display/">Display Settings</a><BR><BR>
-<a href="defaults/">User Defaults</a><BR><BR>
-<a href="profile/">User Profile</a><BR><BR>
-<a href="password/">Change Password</a><BR>
+<a href="display/"><?php echo _('Display Settings'); ?></a><BR><BR>
+<a href="defaults/"><?php echo _('User Defaults'); ?></a><BR><BR>
+<a href="profile/"><?php echo _('User Profile'); ?></a><BR><BR>
+<a href="password/"><?php echo _('Change Password'); ?></a><BR>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
 </body>
 </html>

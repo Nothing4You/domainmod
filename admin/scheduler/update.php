@@ -3,7 +3,7 @@
  * /admin/scheduler/update.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -59,7 +59,7 @@ if ($a == 'u') {
     $stmt->bindValue('id', $id, PDO::PARAM_INT);
     $stmt->execute();
 
-    $message = 'Task Updated<BR>';
+    $message = _('Task Updated') . '<BR>';
 
 } elseif ($a == 'e') {
 
@@ -83,7 +83,7 @@ if ($a == 'u') {
     $stmt->bindValue('id', $id, PDO::PARAM_INT);
     $stmt->execute();
 
-    $message = 'Task Enabled<BR>';
+    $message = _('Task Enabled') . '<BR>';
 
 } elseif ($a == 'd') {
 
@@ -95,7 +95,7 @@ if ($a == 'u') {
     $stmt->bindValue('id', $id, PDO::PARAM_INT);
     $stmt->execute();
 
-    $message = 'Task Disabled<BR>';
+    $message = _('Task Disabled') . '<BR>';
 
 }
 

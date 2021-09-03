@@ -3,7 +3,7 @@
  * /classes/DomainMOD/User.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -24,10 +24,12 @@ namespace DomainMOD;
 class User
 {
     public $deeb;
+    public $time;
 
     public function __construct()
     {
         $this->deeb = Database::getInstance();
+        $this->time = new Time();
     }
 
     public function getAdminId()
@@ -38,11 +40,20 @@ class User
             WHERE username = 'admin'")->fetchColumn();
     }
 
+    public function getUserId($username)
+    {
+        $stmt = $this->deeb->cnxx->prepare("
+            SELECT id
+            FROM users
+            WHERE username = :username");
+        $stmt->bindValue('username', $username, \PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
     public function getFullName($user_id)
     {
-        $pdo = $this->deeb->cnxx;
-
-        $stmt = $pdo->prepare("
+        $stmt = $this->deeb->cnxx->prepare("
             SELECT first_name, last_name
             FROM users
             WHERE id = :user_id");
@@ -50,8 +61,33 @@ class User
         $stmt->execute();
         $result = $stmt->fetch();
         $stmt->closeCursor();
-
         return $result->first_name . ' ' . $result->last_name;
+    }
+
+    public function generatePassword($password_length = 72)
+    {
+        $character_pool = 'abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+        return substr(str_shuffle($character_pool), 0, $password_length);
+    }
+
+    public function generateHash($password)
+    {
+        return password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    public function setDarkMode()
+    {
+        $stmt = $this->deeb->cnxx->prepare("
+            UPDATE user_settings
+            SET dark_mode = :dark_mode,
+                update_time = :update_time
+            WHERE user_id = :user_id");
+        $timestamp = $this->time->stamp();
+        $stmt->bindValue('dark_mode', $_SESSION['s_dark_mode'], \PDO::PARAM_INT);
+        $stmt->bindValue('update_time', $timestamp, \PDO::PARAM_STR);
+        $stmt->bindValue('user_id', $_SESSION['s_user_id'], \PDO::PARAM_INT);
+        $stmt->execute();
+        return;
     }
 
 } //@formatter:on

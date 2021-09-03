@@ -3,7 +3,7 @@
  * /_includes/layout/footer-login.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -19,8 +19,6 @@
  *
  */
 ?>
-  </div>
-  <!-- /.login-box-body -->
 </div>
 <!-- /.login-box -->
 <?php
@@ -33,7 +31,7 @@ if (file_exists($full_filename)) {
 }
 $_SESSION['s_redirect'] = $_SERVER["REQUEST_URI"];
 ?>
-<!-- jQuery 2.2.0 -->
-<script src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/jQuery/jQuery-2.2.0.min.js"></script>
-<!-- Bootstrap 3.3.5 -->
-<script src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/bootstrap/js/bootstrap.min.js"></script>
+<!-- jQuery -->
+<script src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>

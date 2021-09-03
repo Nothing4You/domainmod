@@ -3,7 +3,7 @@
  * /classes/DomainMOD/GoDaddy.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -40,7 +40,7 @@ class GoDaddy
         } elseif ($command == 'info') {
             return $base_url . 'domains/' . $domain;
         } else {
-            return 'Unable to build API URL';
+            return _('Unable to build API URL');
         }
     }
 
@@ -125,7 +125,7 @@ class GoDaddy
 
         } elseif (isset($array_results['domain']) && !isset($array_results['expires']) && !isset($array_results['contactRegistrant']['nameFirst'])) {
 
-            $domain_status = 'invalid';
+            $domain_status = strtolower(_('Invalid'));
             $log_message = 'Invalid domain (not registered at GoDaddy)';
             $log_extra = array('Domain' => $domain, 'API Key' => $this->format->obfusc($api_key), 'API Secret' => $this->format->obfusc($api_secret));
             $this->log->warning($log_message, $log_extra);

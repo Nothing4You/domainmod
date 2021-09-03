@@ -3,7 +3,7 @@
  * /_includes/settings/assets-ssl-types.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -20,14 +20,11 @@
  */
 ?>
 <?php
-$page_title = "SSL Certificate Types";
-$breadcrumb = "SSL Types";
+$page_title = _('SSL Certificate Types');
+$breadcrumb = _('SSL Types');
 $software_section = "assets";
 $software_section_logo = "fa-cubes";
 $slug = "assets-ssl-types";
-$datatable_css = '#' . $slug . ' thead th { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }
-                  #' . $slug . ' tbody tr:hover { background-color: #dddddd; }
-                  #' . $slug . ' tbody td { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }';
 $datatable_class = 'table table-striped dt-responsive cell-border compact';
 $datatable_options = 'var oldStart = 0;
                       $(\'#' . $slug . '\').DataTable({

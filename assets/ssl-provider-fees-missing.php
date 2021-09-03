@@ -3,7 +3,7 @@
  * /assets/ssl-provider-fees-missing.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -44,7 +44,7 @@ $pdo = $deeb->cnxx;
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 $result = $pdo->query("
@@ -54,16 +54,16 @@ $result = $pdo->query("
       AND sc.fee_id = '0'
     GROUP BY sp.name
     ORDER BY sp.name ASC")->fetchAll();
-?>
-The following SSL Certificates are missing fees. In order to ensure your SSL reporting is accurate please update these
-fees as soon as possible.<BR>
 
+echo _('The following SSL Certificates are missing fees. In order to ensure your SSL reporting is accurate please update these fees as soon as possible.');
+?>
+<BR>
 <table id="<?php echo $slug; ?>" class="<?php echo $datatable_class; ?>">
     <thead>
     <tr>
         <th width="20px"></th>
-        <th>Provider</th>
-        <th>Missing Fees</th>
+        <th><?php echo _('Provider'); ?></th>
+        <th><?php echo _('Missing Fees'); ?></th>
     </tr>
     </thead>
     <tbody><?php

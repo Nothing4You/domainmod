@@ -3,7 +3,7 @@
  * /classes/DomainMOD/System.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -26,12 +26,14 @@ class System
     public $deeb;
     public $log;
     public $layout;
+    public $sanitize;
 
     public function __construct()
     {
         $this->deeb = Database::getInstance();
         $this->log = new Log('class.system');
         $this->layout = new Layout();
+        $this->sanitize = new Sanitize();
     }
 
     public function getRequirements()
@@ -49,42 +51,42 @@ class System
         $req_html_long = '';
 
         // SERVER SOFTWARE
-        $req_text .= 'Server Software: ';
-        $req_html_short .= '<STRONG>Server Software:</STRONG> ';
-        $req_html_long .= '<STRONG>Server Software</STRONG><BR>';
+        $req_text .= _('Server Software') . ': ';
+        $req_html_short .= '<STRONG>' . _('Server Software') . ':</STRONG> ';
+        $req_html_long .= '<STRONG>' . _('Server Software') . '</STRONG><BR>';
 
         // PHP
-        $software = 'PHP v5.3.2+';
-        $min_php_version = '5.3.2';
+        $software = 'PHP v5.5+';
+        $min_php_version = '5.5';
         $installed_php_version = phpversion();
 
         if ($installed_php_version >= $min_php_version) {
 
-            $req_text .= $software . ': Pass, ';
-            $req_html_short .= $software . ': ' . $this->layout->highlightText('green', 'Pass') . ', ';
-            $req_html_long .= $software . ': ' . $this->layout->highlightText('green', 'Pass') . '<BR>';
+            $req_text .= $software . ': ' . _('Pass') . ', ';
+            $req_html_short .= $software . ': ' . $this->layout->highlightText('green', _('Pass')) . ', ';
+            $req_html_long .= $software . ': ' . $this->layout->highlightText('green', _('Pass')) . '<BR>';
 
         } else {
 
-            $req_text .= $software . ': Fail, ';
-            $req_html_short .= $software . ': ' . $this->layout->highlightText('red', 'Fail') . ', ';
-            $req_html_long .= $software . ': ' . $this->layout->highlightText('red', 'Fail') . '<BR>';
+            $req_text .= $software . ': ' . _('Fail') . ', ';
+            $req_html_short .= $software . ': ' . $this->layout->highlightText('red', _('Fail')) . ', ';
+            $req_html_long .= $software . ': ' . $this->layout->highlightText('red', _('Fail')) . '<BR>';
 
         }
 
         // MySQL
-        $software = 'MySQL';
+        $software = _('MySQL');
         if (extension_loaded('pdo_mysql')) {
 
-            $req_text .= $software . ': Pass';
-            $req_html_short .= $software . ': ' . $this->layout->highlightText('green', 'Pass') . ', ';
-            $req_html_long .= $software . ': ' . $this->layout->highlightText('green', 'Pass') . '<BR>';
+            $req_text .= $software . ': ' . _('Pass') . ', ';
+            $req_html_short .= $software . ': ' . $this->layout->highlightText('green', _('Pass')) . ', ';
+            $req_html_long .= $software . ': ' . $this->layout->highlightText('green', _('Pass')) . '<BR>';
 
         } else {
 
-            $req_text .= $software . ': Fail';
-            $req_html_short .= $software . ': ' . $this->layout->highlightText('red', 'Fail') . ', ';
-            $req_html_long .= $software . ': ' . $this->layout->highlightText('red', 'Fail') . '<BR>';
+            $req_text .= $software . ': ' . _('Fail');
+            $req_html_short .= $software . ': ' . $this->layout->highlightText('red', _('Fail')) . ', ';
+            $req_html_long .= $software . ': ' . $this->layout->highlightText('red', _('Fail')) . '<BR>';
 
         }
 
@@ -97,26 +99,27 @@ class System
     {
         // PHP Extensions
         $req_text .= ' / PHP Extensions: ';
-        $req_html_short .= '<BR><STRONG>PHP Extensions:</STRONG> ';
-        $req_html_long .= '<BR><STRONG>PHP Extensions</STRONG><BR>';
+        $req_html_short .= '<BR><STRONG>' . _('PHP Extensions') . ':</STRONG> ';
+        $req_html_long .= '<BR><STRONG>' . _('PHP Extensions') . '</STRONG><BR>';
 
         $extensions = array('pdo_mysql' => 'PDO (MySQL)',
                             'curl' => 'cURL',
-                            'openssl' => 'OpenSSL');
+                            'openssl' => 'OpenSSL',
+                            'gettext' => 'gettext');
 
         foreach ($extensions as $key => $value) {
 
             if (extension_loaded($key)) {
 
-                $req_text .= $value . ': Enabled, ';
-                $req_html_short .= $value . ': ' . $this->layout->highlightText('green', 'Enabled') . ', ';
-                $req_html_long .= $value . ': ' . $this->layout->highlightText('green', 'Enabled') . '<BR>';
+                $req_text .= $value . ': ' . _('Enabled') . ', ';
+                $req_html_short .= $value . ': ' . $this->layout->highlightText('green', _('Enabled')) . ', ';
+                $req_html_long .= $value . ': ' . $this->layout->highlightText('green', _('Enabled')) . '<BR>';
 
             } else {
 
-                $req_text .= $value . ': Disabled, ';
-                $req_html_short .= $value . ': ' . $this->layout->highlightText('red', 'Disabled') . ', ';
-                $req_html_long .= $value . ': ' . $this->layout->highlightText('red', 'Disabled') . '<BR>';
+                $req_text .= $value . ': ' . _('Disabled') . ', ';
+                $req_html_short .= $value . ': ' . $this->layout->highlightText('red', _('Disabled')) . ', ';
+                $req_html_long .= $value . ': ' . $this->layout->highlightText('red', _('Disabled')) . '<BR>';
 
             }
 
@@ -132,8 +135,8 @@ class System
     {
         // PHP SETTINGS
         $req_text .= ' / PHP Settings: ';
-        $req_html_short .= '<BR><STRONG>PHP Settings:</STRONG> ';
-        $req_html_long .= '<BR><STRONG>PHP Settings</STRONG><BR>';
+        $req_html_short .= '<BR><STRONG>' . _('PHP Settings') . ':</STRONG> ';
+        $req_html_long .= '<BR><STRONG>' . _('PHP Settings') . '</STRONG><BR>';
 
         $settings = array('allow_url_fopen');
 
@@ -141,15 +144,15 @@ class System
 
             if (ini_get($value)) {
 
-                $req_text .= $value . ': Enabled, ';
-                $req_html_short .= $value . ': ' . $this->layout->highlightText('green', 'Enabled') . ', ';
-                $req_html_long .= $value . ': ' . $this->layout->highlightText('green', 'Enabled') . '<BR>';
+                $req_text .= $value . ': ' . _('Enabled') . ', ';
+                $req_html_short .= $value . ': ' . $this->layout->highlightText('green', _('Enabled')) . ', ';
+                $req_html_long .= $value . ': ' . $this->layout->highlightText('green', _('Enabled')) . '<BR>';
 
             } else {
 
-                $req_text .= $value . ': Disabled, ';
-                $req_html_short .= $value . ': ' . $this->layout->highlightText('red', 'Disabled') . ', ';
-                $req_html_long .= $value . ': ' . $this->layout->highlightText('red', 'Disabled') . '<BR>';
+                $req_text .= $value . ': ' . _('Disabled') . ', ';
+                $req_html_short .= $value . ': ' . $this->layout->highlightText('red', _('Disabled')) . ', ';
+                $req_html_long .= $value . ': ' . $this->layout->highlightText('red', _('Disabled')) . '<BR>';
 
             }
 
@@ -197,7 +200,7 @@ class System
     public function getLiveVersion()
     {
         $version_file = 'https://raw.githubusercontent.com/domainmod/domainmod/master/version.txt';
-        return $this->getFileContents('Get Live Version', 'error', $version_file);
+        return $this->getFileContents(_('Get Live Version'), 'error', $version_file);
     }
 
     public function getDbVersion()
@@ -209,8 +212,8 @@ class System
 
     public function getUpgradeMessage()
     {
-        return "A new version of DomainMOD is available for download. <a target=\"_blank\"
-                href=\"http://domainmod.org/upgrade/\">Click here for upgrade instructions</a>.<BR>";
+        return sprintf(_('A new version of %s is available for download.'), SOFTWARE_TITLE) . " <a target=\"_blank\"
+                href=\"http://domainmod.org/upgrade/\">" . _('Click here for upgrade instructions') . "</a>.<BR>";
     }
 
     public function checkExistingAssets()
@@ -245,16 +248,31 @@ class System
     {
         if ($_SESSION['s_is_logged_in'] != 1) {
             $_SESSION['s_user_redirect'] = $_SERVER["REQUEST_URI"];
-            $_SESSION['s_message_danger'] .= 'You must be logged in to access this area<BR>';
+            $_SESSION['s_message_danger'] .= _('You must be logged in to access this area') . '<BR>';
             header('Location: ' . WEB_ROOT . '/');
             exit;
+        } else {
+            $pdo = $this->deeb->cnxx;
+            $stmt = $pdo->prepare("
+                SELECT `password`
+                FROM users
+                WHERE username = :new_username
+                  AND active = '1'");
+            $stmt->bindValue('new_username', $_SESSION['s_username'], \PDO::PARAM_STR);
+            $stmt->execute();
+            $stored_hash = $stmt->fetchColumn();
+            if ($_SESSION['s_stored_hash'] != $stored_hash) {
+                $_SESSION['s_message_danger'] .= _('You must be logged in to access this area') . '<BR>';
+                header('Location: ' . WEB_ROOT . '/logout.php');
+                exit;
+            }
         }
     }
 
     public function installCheck()
     {
         if ($this->installMode() === 0) {
-            $_SESSION['s_message_danger'] .= SOFTWARE_TITLE . " is already installed<BR><BR>You should delete the /install/ folder<BR>";
+            $_SESSION['s_message_danger'] .= sprintf(_('%s is already installed'), SOFTWARE_TITLE) . "<BR><BR>" . sprintf(_('You should delete the %s folder'), '/install/') . "<BR>";
             header('Location: ' . WEB_ROOT . '/');
             exit;
         }
@@ -263,8 +281,8 @@ class System
     public function readOnlyCheck($redirect_url)
     {
         if ($_SESSION['s_read_only'] == '1') {
-            $_SESSION['s_message_danger'] .= "You are not authorized to perform that action<BR>";
-            header('Location: ' . $redirect_url);
+            $_SESSION['s_message_danger'] .= _('You are not authorized to perform that action') . '<BR>';
+            header('Location: ' . $this->sanitize->text($redirect_url));
             exit;
         }
     }
@@ -303,12 +321,11 @@ class System
     public function showMessageSuccess($result_message)
     {
         ob_start(); ?>
-        <BR>
         <div class="alert alert-success alert-dismissible">
         <?php /* ?>
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         <?php */ ?>
-            <h4><i class="icon fa fa-check"></i> Success</h4>
+            <h4><i class="icon fa fa-check"></i> <?php echo _('Success'); ?></h4>
             <?php echo $result_message; ?>
         </div><?php
         return ob_get_clean();
@@ -317,9 +334,8 @@ class System
     public function showMessageDanger($result_message)
     {
         ob_start(); ?>
-        <BR>
         <div class="alert alert-danger alert-dismissible">
-            <h4><i class="icon fa fa-exclamation-circle"></i> Alert!</h4>
+            <h4><i class="icon fa fa-exclamation-circle"></i> <?php echo _('Alert'); ?>!</h4>
             <?php echo $result_message; ?>
         </div><?php
         return ob_get_clean();
@@ -328,12 +344,11 @@ class System
     public function showMessageInfo($result_message)
     {
         ob_start(); ?>
-        <BR>
         <div class="alert alert-info alert-dismissible">
         <?php /* ?>
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         <?php */ ?>
-            <h4><i class="icon fa fa-info"></i> Info</h4>
+            <h4><i class="icon fa fa-info"></i> <?php echo _('Info'); ?></h4>
             <?php echo $result_message; ?>
         </div><?php
         return ob_get_clean();
@@ -342,9 +357,8 @@ class System
     public function showMaintenanceTable($result_message)
     {
         ob_start(); ?>
-        <BR>
         <div class="alert alert-warning alert-dismissible">
-            <h4><i class="icon fa fa-exclamation-triangle"></i> Attention Required!</h4>
+            <h4><i class="icon fa fa-exclamation-triangle"></i> <?php echo _('Attention Required'); ?>!</h4>
             <?php echo $result_message; ?>
         </div><?php
         return ob_get_clean();
@@ -353,9 +367,8 @@ class System
     public function showDebugTable($result_message)
     {
         ob_start(); ?>
-        <BR>
         <div class="alert alert-info alert-dismissible bg-aqua-active">
-            <h4><i class="icon fa fa-info-circle"></i> Info</h4>
+            <h4><i class="icon fa fa-info-circle"></i> <?php echo _('Info'); ?></h4>
             <?php echo $result_message; ?>
         </div><?php
         return ob_get_clean();
@@ -455,7 +468,7 @@ class System
 
     public function getIpRemotely()
     {
-        return $this->getFileContents('External IP API Call (ipify)', 'warning', 'https://api.ipify.org');
+        return $this->getFileContents(_('External IP API Call') . ' (ipify)', 'warning', 'https://api.ipify.org');
     }
 
 } //@formatter:on

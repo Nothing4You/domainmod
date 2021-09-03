@@ -3,7 +3,7 @@
  * /reporting/index.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -37,8 +37,6 @@ require_once DIR_INC . '/settings/reporting-main.inc.php';
 $system->authCheck();
 
 $report = $_REQUEST['report'];
-
-echo $layout->jumpMenu();
 ?>
 <?php require_once DIR_INC . '/doctype.inc.php'; ?>
 <html>
@@ -46,55 +44,52 @@ echo $layout->jumpMenu();
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
-Before running any reports you should <a href="<?php echo $web_root; ?>/maintenance/update-conversions.php">update the conversion rates</a>.
+<?php echo sprintf(_('Before running any reports you should %supdate the conversion rates%s.'), '<a href="' . $web_root . '/maintenance/update-conversions.php">', '</a>'); ?>
 
-<h3>Domain Reports</h3>
-<?php
-echo $form->showFormTop('');
-echo $form->showDropdownTopJump('', '', '', '');
-echo $form->showDropdownOptionJump($web_root . '/reporting/', '', 'Click to select a Domain Report', '');
-echo $form->showDropdownOptionJump($web_root . '/reporting/domains/cost-by-category.php', '', 'Cost by Category', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/domains/cost-by-dns.php', '', 'Cost by DNS Profile', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/domains/cost-by-ip-address.php', '', 'Cost by IP Address', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/domains/cost-by-month.php', '', 'Cost by Month', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/domains/cost-by-owner.php', '', 'Cost by Owner', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/domains/cost-by-registrar.php', '', 'Cost by Registrar', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/domains/cost-by-tld.php', '', 'Cost by TLD', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/domains/cost-by-host.php', '', 'Cost by Web Host', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/domains/registrar-fees.php?all=0', '', 'Registrar Fees', 'null');
-echo $form->showDropdownBottom('');
-echo $form->showFormBottom('');
-?>
+<BR><BR>
+<div class="row">
+    <?php echo $layout->contentBoxTop(_('Domain Reports'), '3'); ?>
+    <a href='domains/cost-by-category.php'><?php echo _('Cost by Category'); ?></a><BR>
+    <a href='domains/cost-by-dns.php'><?php echo _('Cost by DNS Profile'); ?></a><BR>
+    <a href='domains/cost-by-ip-address.php'><?php echo _('Cost by IP Address'); ?></a><BR>
+    <a href='domains/cost-by-month.php'><?php echo _('Cost by Month'); ?></a><BR>
+    <a href='domains/cost-by-owner.php'><?php echo _('Cost by Owner'); ?></a><BR>
+    <a href='domains/cost-by-registrar.php'><?php echo _('Cost by Registrar'); ?></a><BR>
+    <a href='domains/cost-by-tld.php'><?php echo _('Cost by TLD'); ?></a><BR>
+    <a href='domains/cost-by-host.php'><?php echo _('Cost by Web Host'); ?></a><BR>
+    <a href='domains/registrar-fees.php?all=0'><?php echo _('Registrar Fees'); ?></a>
+    <?php echo $layout->contentBoxBottom(); ?>
 
-<h3>SSL Certificate Reports</h3>
-<?php
-echo $form->showFormTop('');
-echo $form->showDropdownTopJump('', '', '', '');
-echo $form->showDropdownOptionJump($web_root . '/reporting/', '', 'Click to select an SSL Report', '');
-echo $form->showDropdownOptionJump($web_root . '/reporting/ssl/cost-by-category.php', '', 'Cost by Category', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/ssl/cost-by-domain.php', '', 'Cost by Domain', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/ssl/cost-by-ip-address.php', '', 'Cost by IP Address', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/ssl/cost-by-month.php', '', 'Cost by Month', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/ssl/cost-by-owner.php', '', 'Cost by Owner', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/ssl/cost-by-provider.php', '', 'Cost by Provider', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/ssl/cost-by-type.php', '', 'Cost by Type', 'null');
-echo $form->showDropdownOptionJump($web_root . '/reporting/ssl/provider-fees.php?all=0', '', 'Provider Fees', 'null');
-echo $form->showDropdownBottom('');
-echo $form->showFormBottom('');
-?>
+    <?php echo $layout->contentBoxTop(_('SSL Certificate Reports'), '3'); ?>
+    <a href='ssl/cost-by-category.php'><?php echo _('Cost by Category'); ?></a><BR>
+    <a href='ssl/cost-by-domain.php'><?php echo _('Cost by Domain'); ?></a><BR>
+    <a href='ssl/cost-by-ip-address.php'><?php echo _('Cost by IP Address'); ?></a><BR>
+    <a href='ssl/cost-by-month.php'><?php echo _('Cost by Month'); ?></a><BR>
+    <a href='ssl/cost-by-owner.php'><?php echo _('Cost by Owner'); ?></a><BR>
+    <a href='ssl/cost-by-provider.php'><?php echo _('Cost by Provider'); ?></a><BR>
+    <a href='ssl/cost-by-type.php'><?php echo _('Cost by Type'); ?></a><BR>
+    <a href='ssl/provider-fees.php?all=0'><?php echo _('Provider Fees'); ?></a><BR>
+    &nbsp;
+    <?php echo $layout->contentBoxBottom(); ?>
 
-<h3>Data Warehouse Reports</h3>
-<?php
-echo $form->showFormTop('');
-echo $form->showDropdownTopJump('', '', '', '');
-echo $form->showDropdownOptionJump($web_root . '/reporting/', '', 'Click to select a DW Report', '');
-echo $form->showDropdownOptionJump($web_root . '/reporting/dw/potential-problems.php?generate=1', '', 'Potential Problems', 'null');
-echo $form->showDropdownBottom('');
-echo $form->showFormBottom('');
-?>
+    <?php echo $layout->contentBoxTop(_('Data Warehouse Reports'), '3'); ?>
+    <a href='dw/potential-problems.php?generate=1'><?php echo _('Potential Problems'); ?></a><BR>
+    &nbsp;<BR>
+    &nbsp;<BR>
+    &nbsp;<BR>
+    &nbsp;<BR>
+    &nbsp;<BR>
+    &nbsp;<BR>
+    &nbsp;<BR>
+    &nbsp;
+    <?php echo $layout->contentBoxBottom(); ?>
 
+    <div class="col-md-3">
+        &nbsp;
+    </div>
+</div>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
 </body>
 </html>

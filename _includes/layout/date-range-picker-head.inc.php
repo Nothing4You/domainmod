@@ -3,7 +3,7 @@
  * /_includes/layout/date-range-picker-head.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -19,4 +19,4 @@
  *
  */
 ?>
-<link rel="stylesheet" type="text/css" href="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/daterangepicker/daterangepicker-bs3.css" />
+<link rel="stylesheet" href="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/daterangepicker/daterangepicker.css">

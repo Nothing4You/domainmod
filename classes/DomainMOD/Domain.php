@@ -3,7 +3,7 @@
  * /classes/DomainMOD/Domain.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -47,7 +47,7 @@ class Domain
 
                 if ($invalid_count < $invalid_to_display) {
 
-                    $result_message .= "Line " . number_format($key + 1) . " contains an invalid domain<BR>";
+                    $result_message .= sprintf(_('Line %s contains an invalid domain'), number_format($key + 1)) . '<BR>';
 
                 }
 
@@ -104,7 +104,7 @@ class Domain
 
         if (!$result) {
 
-            $log_message = "Unable to retrieve domain";
+            $log_message = 'Unable to retrieve domain';
             $log_extra = array('Domain ID' => $domain_id);
             $this->log->critical($log_message, $log_extra);
             return $log_message;

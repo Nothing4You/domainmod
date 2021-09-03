@@ -3,7 +3,7 @@
  * /checks.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -95,11 +95,14 @@ $_SESSION['s_system_default_ssl_provider_account'] = $result->default_ssl_provid
 $_SESSION['s_system_default_ssl_type'] = $result->default_ssl_type;
 $_SESSION['s_system_default_ssl_provider'] = $result->default_ssl_provider;
 $_SESSION['s_system_expiration_days'] = $result->expiration_days;
+$_SESSION['s_system_email_signature'] = $result->email_signature;
 $_SESSION['s_system_currency_converter'] = $result->currency_converter;
 $_SESSION['s_system_local_php_log'] = $result->local_php_log;
 
 // Load User Settings
 $result = $login->getUserSettings($_SESSION['s_user_id']);
+$_SESSION['s_default_language'] = $result->default_language;
+$_SESSION['s_default_language_name'] = $result->language_name;
 $_SESSION['s_default_currency'] = $result->default_currency;
 $_SESSION['s_default_timezone'] = $result->default_timezone;
 $_SESSION['s_expiration_emails'] = $result->expiration_emails;
@@ -139,6 +142,7 @@ $_SESSION['s_display_ssl_expiry_date'] = $result->display_ssl_expiry_date;
 $_SESSION['s_display_ssl_fee'] = $result->display_ssl_fee;
 $_SESSION['s_display_inactive_assets'] = $result->display_inactive_assets;
 $_SESSION['s_display_dw_intro_page'] = $result->display_dw_intro_page;
+$_SESSION['s_dark_mode'] = (int) $result->dark_mode;
 
 // Load Custom Domain Field Data
 $_SESSION['s_cdf_data'] = $custom_field->getCDFData();
@@ -192,7 +196,7 @@ if ($_SESSION['s_version_error'] != '1') {
     // If it's a new password ask the user to change it
     if ($_SESSION['s_is_new_password'] == 1) {
 
-        $_SESSION['s_message_danger'] .= "Your password should be changed for security purposes<BR>";
+        $_SESSION['s_message_danger'] .= _('Your password should be changed for security purposes') . '<BR>';
         header("Location: settings/password/");
         exit;
 

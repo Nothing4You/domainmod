@@ -3,7 +3,7 @@
  * /_includes/layout/asset-footer.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -21,10 +21,10 @@
 ?>
 <?php if ($_SESSION['s_display_inactive_assets'] != "1") { ?>
 
-    <em>Inactive Assets are currently hidden. <a href="<?php echo $web_root; ?>/settings/toggles/inactive-assets.php">Click here to display them</a>.</em><BR><?php
+    <em><?php echo _('Inactive Assets are currently hidden.'); ?> <a href="<?php echo $web_root; ?>/settings/toggles/inactive-assets/"><?php echo _('Click here to display them'); ?></a>.</em><BR><?php
 
 } else { ?>
 
-    <em>Inactive Assets are currently displayed. <a href="<?php echo $web_root; ?>/settings/toggles/inactive-assets.php">Click here to hide them</a>.</em><BR><?php
+    <em><?php echo _('Inactive Assets are currently displayed.'); ?> <a href="<?php echo $web_root; ?>/settings/toggles/inactive-assets/"><?php echo _('Click here to hide them'); ?></a>.</em><BR><?php
 
 }

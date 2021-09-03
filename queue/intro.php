@@ -3,7 +3,7 @@
  * /queue/intro.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -43,11 +43,12 @@ $pdo = $deeb->cnxx;
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
-The Domain Queue allows you to use your domain registrar's API to automatically import the details of your domains, such as expiry date and DNS servers, which are then added to your main DomainMOD database along with your domains. All you have to do is choose the registrar account, supply a list of domains, and the rest of the work is done for you. Depending on the registrar, you may not even have to supply the list of domains.<BR>
+<?php echo sprintf(_("The Domain Queue allows you to use your domain registrar's API to automatically import the details of your domains, such as expiry date and DNS servers, which are then added to your main %s database along with your domains."), SOFTWARE_TITLE) . '&nbsp;'; ?>
+<?php echo _('All you have to do is choose the registrar account, supply a list of domains, and the rest of the work is done for you. Depending on the registrar, you may not even have to supply the list of domains.'); ?><BR>
 <BR>
-If you use a registrar that isn't already supported, and they have an API, send us an email at <a href="mailto:suggestions@domainmod.org">suggestions@domainmod.org</a> and we'll see what we can do about adding it.<BR>
+<?php echo sprintf(_("If you use a registrar that isn't already supported, and they have an API, send us an email at %s and we'll see what we can do about adding it."), '<a href="mailto:suggestions@domainmod.org">suggestions@domainmod.org</a>'); ?><BR>
 <BR>
 <?php
 $result = $pdo->query("
@@ -63,11 +64,12 @@ foreach ($result as $row) {
 
 $supported_registrars = substr($supported_registrars, 2);
 ?>
-<strong>Currently Supported Registrars</strong>: <?php echo $supported_registrars; ?><BR>
+<strong><?php echo _('Currently Supported Registrars'); ?></strong>: <?php echo $supported_registrars; ?><BR>
 <BR>
-<strong>NOTE:</strong> In order to use the Domain Queue you must setup the cron job that comes with DomainMOD. For more information please see the <a target="_blank" href="https://domainmod.org/docs/userguide/getting-started/#cron-job">User Guide</a>.<BR>
+<strong><?php echo strtoupper(_('Note')); ?>:</strong> <?php echo sprintf(_('In order to use the Domain Queue you must setup the cron job that comes with %s.'), SOFTWARE_TITLE) . '&nbsp;'; ?>
+<?php echo sprintf(_('For more information please see the %sUser Guide%s.'), '<a target="_blank" href="https://domainmod.org/docs/userguide/getting-started/#cron-job">', '</a>'); ?><BR>
 <BR>
-<a href="<?php echo $web_root; ?>/queue/add.php"><?php echo $layout->showButton('button', 'Add Domains To Queue'); ?></a>
+<a href="<?php echo $web_root; ?>/queue/add/"><?php echo $layout->showButton('button', _('Add Domains To Queue')); ?></a>
 <BR><BR>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
 </body>

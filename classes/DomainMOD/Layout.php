@@ -3,7 +3,7 @@
  * /classes/DomainMOD/Layout.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -29,37 +29,20 @@ class Layout
         return SOFTWARE_TITLE . ' :: ' . $page_title;
     }
 
-    public function jumpMenu()
-    {
-        ob_start(); ?>
-
-        <script type="text/javascript">
-            <!--
-            function MM_jumpMenu(targ, selObj, restore) { //v3.0
-                eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
-                if (restore) selObj.selectedIndex = 0;
-            }
-            //-->
-        </script><?php
-
-        return ob_get_clean();
-    }
-
     public function showButton($button_type, $button_text)
     {
-        ob_start(); ?>
-        <button style="margin-top:5px" type="<?php echo $button_type; ?>" class="btn btn-primary btn-danger"><?php echo $button_text; ?></button>&nbsp;<?php
+        ob_start(); ?><button type="<?php echo $button_type; ?>" class="btn btn-primary btn-danger domainmod-css-button"><?php echo $button_text; ?></button>&nbsp;<?php
         return ob_get_clean();
     }
 
     public function highlightText($colour, $text_to_display)
     {
         if ($colour == 'red') {
-            $text_colour = '#a30000';
+            $class = 'domainmod-css-text-highlight-red';
         } elseif ($colour == 'green') {
-            $text_colour = '#009933';
+            $class = 'domainmod-css-text-highlight-green';
         }
-        ob_start(); ?><strong><span style="color:<?php echo $text_colour; ?>"><?php echo $text_to_display; ?></span></strong><?php
+        ob_start(); ?><strong><span class="<?php echo $class; ?>"><?php echo $text_to_display; ?></span></strong><?php
         return ob_get_clean();
     }
 
@@ -132,6 +115,132 @@ class Layout
             $sqlprod = "";
         }
         return array($sqlprod, $wheToWhe, $wholePiece);
+    }
+
+    public function deleteButton($item_type, $item_name, $url)
+    {
+        echo $this->modalButton(strtoupper(_('Delete This')) . ' ' . strtoupper($item_type));
+        echo $this->modal(_('Delete') . ' ' . $item_type, $item_name, $url, strtoupper(_('Cancel')), strtoupper(_('Yes, Delete')));
+    }
+
+    public function modalButton($name)
+    {
+        ob_start(); ?>
+
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal">
+              <?php echo $name; ?>
+            </button><?php
+
+        return ob_get_clean();
+    }
+
+    public function modal($title, $item_name, $url, $left_button, $right_button)
+    {
+        ob_start(); ?>
+
+            <div class="modal fade" id="myModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title"><?php echo $title; ?></h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p><?php echo sprintf(_('Are you sure you want to delete %s'), '<strong>' . $item_name . '</strong>') . '?'; ?></p>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $left_button; ?></button>
+                            <a href="<?php echo $url; ?>"><button type="button" class="btn btn-danger"><?php echo $right_button; ?></button></a>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <!-- /.modal --><?php
+
+        return ob_get_clean();
+    }
+
+    public function expandableBoxTop($title, $url, $url_text)
+    {
+        ob_start(); ?>
+
+        <div class="card card-outline card-danger collapsed-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </button>
+                        <?php echo $title; ?><?php if ($url != '') { ?>&nbsp;&nbsp;[<a href='<?php echo $url; ?>'><?php echo $url_text; ?></a>]<?php } ?>
+                    </div>
+                </h3>
+                <!-- /.card-tools -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body"><?php
+
+        return ob_get_clean();
+
+    }
+
+    public function expandableBoxBottom()
+    {
+        ob_start(); ?>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card --><?php
+
+        return ob_get_clean();
+
+    }
+
+    public function contentBoxTop($title, $width)
+    {
+        ob_start(); ?>
+
+            <div class="col-md-<?php echo $width; ?>">
+                <div class="card card-outline card-danger">
+                    <?php if ($title != '') { ?>
+                        <div class="card-header">
+                            <h3 class="card-title"><?php echo $title; ?></h3>
+                        </div>
+                    <?php } ?>
+                    <div class="card-body"><?php
+
+        return ob_get_clean();
+
+    }
+
+    public function contentBoxBottom()
+    {
+        ob_start(); ?>
+
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col --><?php
+
+        return ob_get_clean();
+
+    }
+    public function sidebarDarkMode()
+    {
+        if ($_SESSION['s_dark_mode'] === 1) return ' sidebar-dark-red';
+        return ' sidebar-light-red domainmod-css-logo-background-colour';
+    }
+
+    public function bodyDarkMode()
+    {
+        if ($_SESSION['s_dark_mode'] === 1) return ' dark-mode';
+        return '';
     }
 
 } //@formatter:on

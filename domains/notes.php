@@ -3,7 +3,7 @@
  * /domains/notes.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -54,7 +54,7 @@ if ($result) {
 
 }
 
-$page_title = "Domain Notes (" . $new_domain . ")";
+$page_title = sprintf(_('Domain Notes (%s)'), $new_domain);
 $software_section = "domains";
 ?>
 <?php require_once DIR_INC . '/doctype.inc.php'; ?>
@@ -63,11 +63,11 @@ $software_section = "domains";
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php
 $page_align = 'left';
 require_once DIR_INC . '/layout/header-bare.inc.php'; ?>
-<strong>Notes For <?php echo $new_domain; ?></strong><BR>
+<strong><?php echo sprintf(_('Notes For %s'), $new_domain); ?></strong><BR>
 <BR>
 <?php
 $format = new DomainMOD\Format();

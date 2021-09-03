@@ -3,7 +3,7 @@
  * /_includes/settings/reporting-main.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -20,43 +20,8 @@
  */
 ?>
 <?php
-$page_title = "Reporting";
-$breadcrumb = "Reporting";
+$page_title = _('Reporting');
+$breadcrumb = $page_title;
 $software_section = "reporting";
 $software_section_logo = "fa-bar-chart";
 $slug = "reporting-main";
-$datatable_css = '#' . $slug . ' thead th { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }
-                  #' . $slug . ' tbody tr:hover { background-color: #dddddd; }
-                  #' . $slug . ' tbody td { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }';
-$datatable_class = 'table table-striped dt-responsive cell-border compact';
-$datatable_options = 'var oldStart = 0;
-                      $(\'#' . $slug . '\').DataTable({
-                          "paging": true,
-                          "lengthChange": true,
-                          "lengthMenu": [ [25, 50, 75, 100, -1], [25, 50, 75, 100, "All"] ],
-                          "searching": true,
-                          "info": true,
-                          "autoWidth": true,
-                          "bAutoWidth": false,
-                          "responsive": {
-                               details: {
-                                         type: "column"
-                                        }
-                                        },
-                          "columnDefs": [ {
-                                           className: "control",
-                                           orderable: false,
-                                           targets:   0
-                                           } ],
-                          "ordering": true,
-                          "order": [[ 1, "asc" ]],
-                          "bSortClasses": false,
-                          "dom": \'<"top"lif>rt<"bottom"ip><"clear">\',
-                          "fnDrawCallback": function (o) {
-                            if ( o._iDisplayStart != oldStart ) {
-                                var targetOffset = $("#' . $slug . '").offset().top;
-                                $("html,body").animate({scrollTop: targetOffset}, 0);
-                                oldStart = o._iDisplayStart;
-                            }
-                          }
-                      });';

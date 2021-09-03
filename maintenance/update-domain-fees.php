@@ -3,7 +3,7 @@
  * /maintenance/update-domain-fees.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -44,7 +44,7 @@ $queryB = new DomainMOD\QueryBuild();
 $sql = $queryB->missingFees('domains');
 $_SESSION['s_missing_domain_fees'] = $system->checkForRows($sql);
 
-$_SESSION['s_message_success'] .= "Domain Fees updated<BR>";
+$_SESSION['s_message_success'] .= _('Domain Fees updated') . '<BR>';
 
 header("Location: index.php");
 exit;

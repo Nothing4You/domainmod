@@ -1,6 +1,4 @@
-[![DomainMOD](https://cdn.domainmod.org/images/logo.png)](https://domainmod.org)
-
-[![Build Status](https://scrutinizer-ci.com/g/domainmod/domainmod/badges/build.png?b=master)](https://scrutinizer-ci.com/g/domainmod/domainmod/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/domainmod/domainmod/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/domainmod/domainmod/?branch=master)
+[![DomainMOD](https://domainmod.org/images/logo.png)](https://domainmod.org)
 
 Project Home: <https://domainmod.org>  
 Project Demo: <https://demo.domainmod.org>  
@@ -19,24 +17,30 @@ So go ahead, take the live demo for a test drive before you install: <https://de
 
 Requirements
 ------------
-**Software**: PHP v5.3.2+, MySQL  
-**PHP Extensions**: PDO (MySQL), cURL, OpenSSL  
+**Software**: PHP v5.5+, MySQL  
+**PHP Extensions**: PDO (MySQL), cURL, OpenSSL, gettext  
 **PHP Settings**: allow_url_fopen  
 
 Downloading
 -----------
-There are currently three options for downloading DomainMOD.
+There are currently four options for downloading DomainMOD.
 
 **Option #1**  
 Visit the following URL to download DomainMOD in a .ZIP file: <https://domainmod.org/download/>
 
 **Option #2**  
-Use git from your web server to retrieve the DomainMOD source code. To do so, change to the directory where you want to install DomainMOD and run the following command (this download option requires that you have git installed on your web server):
+Use git from your web server to download the DomainMOD source code. To do so, change to the directory where you want to install DomainMOD and run the following command (this download option requires that you have git installed on your web server):
 
     git clone https://github.com/domainmod/domainmod.git
 
 **Option #3**  
-Use Softaculous from your web server to download **and** install DomainMOD.  Softaculous is the web hosting industry's leading software auto-installer, and it has helped millions of users install applications with a few clicks of a mouse. Softaculous easily integrates into the leading control panels like cPanel, Plesk, DirectAdmin, InterWorx, H-Sphere, and more. Check your hosting control panel or contact your web host if you're not sure if they offer Softaculous.
+Use Docker from your web server to download and install DomainMOD. To do so, change to the directory where you want to store the Docker build files and DomainMOD database and run the following commands (this download/install option requires that you have git, Docker, and Docker Compose installed on your web server):
+
+    git clone https://github.com/domainmod/docker.git .
+    docker-compose up -d
+
+**Option #4**  
+Use Softaculous from your web server to download and install DomainMOD.  Softaculous is the web hosting industry's leading software auto-installer, and it has helped millions of users install applications with a few clicks of a mouse. Softaculous easily integrates into the leading control panels like cPanel, Plesk, DirectAdmin, InterWorx, H-Sphere, and more. Check your hosting control panel or contact your web host if you're not sure if they offer Softaculous.
 
 To install DomainMOD simply open Softaculous, use the search feature to find DomainMOD, and then click the "Install Now" button. After you answer a few questions about your installation Softaculous will do the rest.
 
@@ -44,7 +48,7 @@ More Information: <http://www.softaculous.com/softaculous/apps/others/DomainMOD/
 
 Installing
 ----------
-If you installed DomainMOD using Softaculous in the previous step you can ignore the rest of this *Installing* section, as you should already have DomainMOD up-and-running.
+If you installed DomainMOD using Docker or Softaculous in the previous step you can ignore the rest of this *Installing* section, as you should already have DomainMOD up-and-running.
 
 If you downloaded the .ZIP file in the previous step, you will now need to upload the archive to your web server and then unpack it into the folder where you wish to install (or unpack it and then upload it, whichever you prefer).
 
@@ -74,21 +78,23 @@ Security
 --------
 Although we've done our best to secure DomainMOD, unfortunately there are many factors that could cause security holes, such as the software being run on insecure hardware, software like PHP and MySQL having out-of-date versions with known vulnerabilities, easy-to-guess passwords being used, and so on. Due to these factors we recommend the following steps to help secure your DomainMOD installation.
 
-1. Do not use easy-to-guess passwords. **Ever**.
+1. Secure your installation with an SSL Certificate.
 
-2. Although DomainMOD has its own authentication system, we recommend that you also use HTTP authentication on your installation directory to add an extra layer of security.
+2. Do not use easy-to-guess passwords. **Ever**.
 
-3. Do not store your account passwords or API keys in DomainMOD. Although the ability to save this information exists, **use it at your own risk**. This information is fairly secure if you run DomainMOD on your local computer, but there's a much higher risk of someone gaining access to it if you host the site on a server that is accessible to the outside world.
+3. Although DomainMOD has its own authentication system, we recommend that you also use HTTP authentication on your installation directory to add an extra layer of security.
 
-    **WARNING:** Saving your API keys (and other relevant API connection information) in DomainMOD is necessary if you want to use the [Domain Queue](domain-queue.md), however we recommend that you only save this information temporarily while you're using the Domain Queue, and that you remove it as soon as you're done.
+4. Do not store your account passwords or API keys in DomainMOD. Although the ability to save this information exists, **use it at your own risk**. This information is fairly secure if you run DomainMOD on your local computer, but there's a much higher risk of someone gaining access to it if you host the site on a server that is accessible to the outside world.
 
-4. Do not host DomainMOD on a public website or on an easy-to-guess URL.
+    **WARNING:** Saving your API keys (and other relevant API connection information) in DomainMOD is necessary if you want to use the Domain Queue, however we recommend that you only save this information temporarily while you're using the Domain Queue, and that you remove it as soon as you're done.
 
-    If you do end up hosting DomainMOD on a public website, you should use your website's robots.txt file to block bots and spiders from crawling your site.
+5. Do not host DomainMOD on a public website or on an easy-to-guess URL.
 
-5. Do not give the URL to anyone who does not need to access DomainMOD. You should treat the URL like a password.
+   If you do end up hosting DomainMOD on a public website, you should use your website's robots.txt file to block bots and spiders from crawling your site, otherwise your DomainMOD URL may end up in public search results.
 
-6. Always use the most up-to-date version of DomainMOD. This will help protect you from any security vulnerabilities that are found and fixed.
+6. Do not give the URL to anyone who does not need to access DomainMOD. You should treat the URL like a password.
+
+7. Always use the most up-to-date version of DomainMOD. This will help protect you from any security vulnerabilities that are found and fixed.
 
 Upgrading
 ---------
@@ -148,7 +154,7 @@ Please see the CHANGELOG file that came with DomainMOD, or view the Changelog on
 License
 -------
 DomainMOD is an open source domain and internet asset manager.  
-Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
 
 DomainMOD is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

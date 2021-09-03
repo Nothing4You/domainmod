@@ -3,7 +3,7 @@
  * /_includes/layout/date-picker-footer.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -19,9 +19,9 @@
  *
  */
 ?>
-<script type="text/javascript" src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/daterangepicker/moment.min.js"></script>
+<script type="text/javascript" src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/moment/moment.min.js"></script>
 <script type="text/javascript" src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/daterangepicker/daterangepicker.js"></script>
-<script>
+<script type="text/javascript" nonce="<?php echo CURRENT_NONCE; ?>">
     $('input[name="datepick"]').daterangepicker(
 {
     locale: {

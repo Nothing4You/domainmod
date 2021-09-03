@@ -3,7 +3,7 @@
  * /_includes/settings/dw-main.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -20,17 +20,11 @@
  */
 ?>
 <?php
-$page_title = "Data Warehouse";
-$breadcrumb = "DW";
+$page_title = _('Data Warehouse');
+$breadcrumb = _('DW');
 $software_section = "dw";
 $software_section_logo = "fa-database";
 $slug = "dw-main";
-$datatable_css = '#' . $slug . '-build thead th { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }
-                  #' . $slug . '-build tbody tr:hover { background-color: #dddddd; }
-                  #' . $slug . '-build tbody td { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }
-                  #' . $slug . '-totals thead th { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }
-                  #' . $slug . '-totals tbody tr:hover { background-color: #dddddd; }
-                  #' . $slug . '-totals tbody td { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }';
 $datatable_class = 'table table-striped dt-responsive cell-border compact';
 $datatable_options = 'var oldStart = 0;
                       $(\'#' . $slug . '-build\').DataTable({

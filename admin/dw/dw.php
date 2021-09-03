@@ -3,7 +3,7 @@
  * /admin/dw/dw.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -31,6 +31,8 @@ $system = new DomainMOD\System();
 $layout = new DomainMOD\Layout();
 $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
+$sanitize = new DomainMOD\Sanitize();
+$unsanitize = new DomainMOD\Unsanitize();
 
 require_once DIR_INC . '/head.inc.php';
 require_once DIR_INC . '/debug.inc.php';
@@ -40,15 +42,15 @@ $system->authCheck();
 $system->checkAdminUser($_SESSION['s_is_admin']);
 $pdo = $deeb->cnxx;
 
-$id = $_GET['id'];
-$action = $_GET['action'];
-$view_all = $_GET['view_all'];
+$dropdown_selection = $sanitize->text($_REQUEST['dropdown_selection']);
 
-if ($action != "") {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && $dropdown_selection != "") {
 
-    if ($action == "dw_accounts") {
+    $action = explode('-', $dropdown_selection);
 
-        if ($view_all == '1') {
+    if ($action[0] == "accounts") {
+
+        if ($action[1] == 'ALL') {
 
             $_SESSION['s_dw_view_all'] = 1;
 
@@ -58,7 +60,7 @@ if ($action != "") {
                 SELECT `name`, `host`
                 FROM dw_servers
                 WHERE id = :id");
-            $stmt->bindValue('id', $id, PDO::PARAM_INT);
+            $stmt->bindValue('id', $action[1], PDO::PARAM_INT);
             $stmt->execute();
             $result = $stmt->fetch();
             $stmt->closeCursor();
@@ -66,7 +68,7 @@ if ($action != "") {
             if ($result) {
 
                 $_SESSION['s_dw_view_all'] = "";
-                $_SESSION['s_dw_server_id'] = $id;
+                $_SESSION['s_dw_server_id'] = $action[1];
                 $_SESSION['s_dw_server_name'] = $result->name;
                 $_SESSION['s_dw_server_host'] = $result->host;
 
@@ -77,9 +79,9 @@ if ($action != "") {
         header("Location: list-accounts.php");
         exit;
 
-    } elseif ($action == "dw_dns_zones") {
+    } elseif ($action[0] == "zones") {
 
-        if ($view_all == '1') {
+        if ($action[1] == 'ALL') {
 
             $_SESSION['s_dw_view_all'] = 1;
 
@@ -89,7 +91,7 @@ if ($action != "") {
                 SELECT `name`, `host`
                 FROM dw_servers
                 WHERE id = :id");
-            $stmt->bindValue('id', $id, PDO::PARAM_INT);
+            $stmt->bindValue('id', $action[1], PDO::PARAM_INT);
             $stmt->execute();
             $result = $stmt->fetch();
             $stmt->closeCursor();
@@ -97,7 +99,7 @@ if ($action != "") {
             if ($result) {
 
                 $_SESSION['s_dw_view_all'] = "";
-                $_SESSION['s_dw_server_id'] = $id;
+                $_SESSION['s_dw_server_id'] = $action[1];
                 $_SESSION['s_dw_server_name'] = $result->name;
                 $_SESSION['s_dw_server_host'] = $result->host;
 
@@ -110,6 +112,10 @@ if ($action != "") {
 
     }
 
+} elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $dropdown_selection == "") {
+
+    $_SESSION['s_message_danger'] = _('Invalid selection, please try again');
+
 }
 ?>
 <?php require_once DIR_INC . '/doctype.inc.php'; ?>
@@ -117,9 +123,8 @@ if ($action != "") {
 <head>
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
-    <?php echo $layout->jumpMenu(); ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 $result = $pdo->query("
@@ -137,8 +142,8 @@ if (!$result) {
 
 }
 ?>
-<a href="servers.php"><?php echo $layout->showButton('button', 'Manage Servers'); ?></a><?php
-if ($has_servers == 1) { ?><a href="rebuild.php"><?php echo $layout->showButton('button', 'Rebuild DW'); ?></a><?php } ?>
+<a href="servers.php"><?php echo $layout->showButton('button', _('Manage Servers')); ?></a>&nbsp;&nbsp;<?php
+if ($has_servers == 1) { ?><a href="rebuild.php"><?php echo $layout->showButton('button', _('Rebuild DW')); ?></a><?php } ?>
 <?php
 $result = $pdo->query("
     SELECT count(*)
@@ -179,60 +184,55 @@ if ($result) {
 
 }
 
-if ($is_the_build_finished == 1 && ($no_results_accounts !== 1 || $no_results_dns_zones !== 1)) { ?>
+if ($is_the_build_finished == 1) {
 
-    <BR><BR><h3>View Data</h3>
-    <?php
+    if ($no_results_accounts !== 1 || $no_results_dns_zones !== 1) { ?>
 
-    echo $form->showFormTop('');
+        <BR><BR><h3><?php echo _('View Data'); ?></h3>
+        <?php
 
-    if ($temp_total_accounts == 0) {
+        echo $form->showFormTop('');
+        echo $form->showDropdownTop('dropdown_selection', '', '', '', '');
 
-        echo "No Accounts exist<BR>";
+        if ($temp_total_accounts != 0) {
 
-    } else {
+            echo $form->showDropdownOption('', strtoupper(_('Server Accounts')), 'null');
+            echo $form->showDropdownOption('accounts-ALL', '&nbsp;&nbsp;' . _('View All'), 'null');
 
-        echo $form->showDropdownTopJump('', '', '', '');
-        echo $form->showDropdownOptionJump($web_root . '/admin/dw/dw.php', '', 'Server Accounts', '');
-        echo $form->showDropdownOptionJump('dw.php?action=dw_accounts&view_all=1', '', 'VIEW ALL', 'null');
+            $result = $pdo->query("
+                SELECT id, `name`, dw_accounts
+                FROM dw_servers
+                ORDER BY name, `host`")->fetchAll();
 
-        $result = $pdo->query("
-            SELECT id, `name`, dw_accounts
-            FROM dw_servers
-            ORDER BY name, `host`")->fetchAll();
+            foreach ($result as $row) {
 
-        foreach ($result as $row) {
+                echo $form->showDropdownOption('accounts-' . $row->id, '&nbsp;&nbsp;' . $row->name . ' (' . number_format($row->dw_accounts) . ' ' . _('Accounts') . ')', 'null');
 
-            echo $form->showDropdownOptionJump('dw.php?action=dw_accounts&id=' . $row->id, '', $row->name . ' (' . number_format($row->dw_accounts) . ' Accounts)', 'null');
+            }
+
+        }
+
+        if ($temp_total_dns_zones != 0) {
+
+            echo $form->showDropdownOption('', strtoupper(_('DNS Zones & Records')), 'null');
+            echo $form->showDropdownOption('zones-ALL', '&nbsp;&nbsp;' . _('View All'), 'null');
+
+            $result = $pdo->query("
+                SELECT id, name, dw_dns_zones, dw_dns_records
+                FROM dw_servers
+                ORDER BY name, host")->fetchAll();
+
+            foreach ($result as $row) {
+
+                echo $form->showDropdownOption('zones-' . $row->id, '&nbsp;&nbsp;' . $row->name . ' (' . number_format($row->dw_dns_zones) . ' ' . _('Zones') . ', ' . number_format($row->dw_dns_records) . ' ' . _('Records') . ')', 'null');
+
+            }
 
         }
 
         echo $form->showDropdownBottom('');
-
-    }
-
-    if ($temp_total_dns_zones == 0) {
-
-        echo "No DNS Zones exist<BR>";
-
-    } else {
-
-        echo $form->showDropdownTopJump('', '', '', '');
-        echo $form->showDropdownOptionJump($web_root . '/admin/dw/dw.php', '', 'DNS Zones & Records', '');
-        echo $form->showDropdownOptionJump('dw.php?action=dw_dns_zones&view_all=1', '', 'VIEW ALL', 'null');
-
-        $result = $pdo->query("
-            SELECT id, name, dw_dns_zones, dw_dns_records
-            FROM dw_servers
-            ORDER BY name, host")->fetchAll();
-
-        foreach ($result as $row) {
-
-            echo $form->showDropdownOptionJump('dw.php?action=dw_dns_zones&id=' . $row->id, '', $row->name . ' (' . number_format($row->dw_dns_zones) . ' Zones, ' . number_format($row->dw_dns_records) . ' Records)', 'null');
-
-        }
-
-        echo $form->showDropdownBottom('');
+        echo $form->showSubmitButton(_('View Data'), '', '');
+        echo $form->showFormBottom('');
 
     }
 
@@ -260,26 +260,26 @@ if (!$result) {
 
 if ($no_results_build_info !== 1) { ?>
 
-    <BR><h3>Build Information</h3>
+    <BR><BR><h3><?php echo _('Build Information'); ?></h3>
     <table id="<?php echo $slug; ?>-build" class="<?php echo $datatable_class; ?>"><?php
 
     if ($result_count == 0) {
 
-        echo "<BR>You don't currently have any servers setup in your Data Warehouse. <a href=\"add-server.php\">Click here to add one</a>.";
+        echo "<BR>" . _("You don't currently have any servers setup in your Data Warehouse.") . " <a href=\"add-server.php\">" . _('Click here to add one') . "</a>.";
 
     } else {
 
         if ($result->build_start_time_overall != '1970-01-01 00:00:00' &&
             $result->build_end_time_overall != '1970-01-01 00:00:00') {
 
-            $temp_build_status_overall = "Successful";
+            $temp_build_status_overall = _('Successful');
 
         }
 
         if ($result->build_start_time_overall != '1970-01-01 00:00:00' &&
             $result->has_ever_been_built_overall == 0) {
 
-            $temp_build_status_overall = "Building...";
+            $temp_build_status_overall = _('Building') . '...';
 
         }
 
@@ -295,11 +295,11 @@ if ($no_results_build_info !== 1) { ?>
 
             if (!$result2) {
 
-                $temp_build_status_overall = "Cleanup...";
+                $temp_build_status_overall = _('Cleanup') . '...';
 
             } else {
 
-                $temp_build_status_overall = "Building...";
+                $temp_build_status_overall = _('Building') . '...';
 
             }
 
@@ -310,7 +310,7 @@ if ($no_results_build_info !== 1) { ?>
         if ($result->build_start_time_overall == '1970-01-01 00:00:00' &&
             $result->has_ever_been_built_overall == 0) {
 
-            $temp_build_status_overall = "Never Built";
+            $temp_build_status_overall = _('Never Built');
 
         }
 
@@ -354,18 +354,18 @@ if ($no_results_build_info !== 1) { ?>
         <thead>
         <tr>
             <th width="20px"></th>
-            <th>Server</th>
-            <th>Build Start</th>
-            <th>Build End</th>
-            <th>Build Time</th>
-            <th>Build Status</th>
+            <th><?php echo _('Server'); ?></th>
+            <th><?php echo _('Build Start'); ?></th>
+            <th><?php echo _('Build End'); ?></th>
+            <th><?php echo _('Build Time'); ?></th>
+            <th><?php echo _('Build Status'); ?></th>
         </tr>
         </thead>
 
         <tbody>
         <tr>
             <td></td>
-            <td><em>Full Build</em></td>
+            <td><em><?php echo _('Full Build'); ?></em></td>
             <td><?php echo $temp_build_start_time_overall; ?></td>
             <td><?php echo $temp_build_end_time_overall; ?></td>
             <td><?php echo $temp_build_time_overall; ?></td>
@@ -391,14 +391,14 @@ if ($no_results_build_info !== 1) { ?>
 
             if ($row->build_start_time != '1970-01-01 00:00:00' && $row->build_end_time != '1970-01-01 00:00:00') {
 
-                $temp_build_status = "Successful";
+                $temp_build_status = _('Successful');
 
             }
 
             if ($row->build_start_time != '1970-01-01 00:00:00' && $row->build_end_time == '1970-01-01 00:00:00' &&
                 $row->build_status == 0) {
 
-                $temp_build_status = "Building...";
+                $temp_build_status = _('Building') . '...';
 
             }
 
@@ -406,11 +406,11 @@ if ($no_results_build_info !== 1) { ?>
 
                 if ($is_building == 1) {
 
-                    $temp_build_status = "Pending";
+                    $temp_build_status = _('Pending');
 
                 } else {
 
-                    $temp_build_status = "Never Built";
+                    $temp_build_status = _('Never Built');
 
                 }
 
@@ -418,13 +418,13 @@ if ($no_results_build_info !== 1) { ?>
 
             if ($row->build_start_time == '1970-01-01 00:00:00' && $row->has_ever_been_built == 1) {
 
-                $temp_build_status = "Pending";
+                $temp_build_status = _('Pending');
 
             }
 
             if ($row->build_start_time != '1970-01-01 00:00:00' && $row->has_ever_been_built == 0) {
 
-                $temp_build_status = "Building...";
+                $temp_build_status = _('Building') . '...';
 
             }
 
@@ -529,16 +529,16 @@ if ($result) {
         $temp_dw_dns_records != 0
     ) { ?>
 
-        <h3>Data Warehouse Totals</h3>
+        <BR><h3><?php echo _('Data Warehouse Totals'); ?></h3>
 
         <table id="<?php echo $slug; ?>-totals" class="<?php echo $datatable_class; ?>">
             <thead>
             <tr>
                 <th width="20px"></th>
-                <th>Server</th>
-                <th>Accounts</th>
-                <th>DNS Zones</th>
-                <th>DNS Records</th>
+                <th><?php echo _('Server'); ?></th>
+                <th><?php echo _('Accounts'); ?></th>
+                <th><?php echo _('DNS Zones'); ?></th>
+                <th><?php echo _('DNS Records'); ?></th>
             </tr>
             </thead>
             <tbody><?php
@@ -557,7 +557,7 @@ if ($result) {
                 <tr>
                 <td></td>
                 <td>
-                    <em>All Servers</em>
+                    <em><?php echo _('All Servers'); ?></em>
                 </td>
                 <td>
                     <?php echo number_format($result2->dw_accounts); ?>

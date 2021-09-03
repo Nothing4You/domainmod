@@ -3,7 +3,7 @@
  * /classes/DomainMOD/NameSilo.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -40,7 +40,7 @@ class NameSilo
         } elseif ($command == 'info') {
             return $base_url . 'getDomainInfo?version=1&type=xml&key=' . $api_key . '&domain=' . $domain;
         } else {
-            return 'Unable to build API URL';
+            return _('Unable to build API URL');
         }
     }
 
@@ -119,7 +119,7 @@ class NameSilo
 
         } elseif ($array_results[0]['reply']['detail'] == 'Domain is not active, or does not belong to this user') {
 
-            $domain_status = 'invalid';
+            $domain_status = strtolower(_('Invalid'));
             $log_message = 'Invalid domain (inactive or nonexistent)';
             $log_extra = array('Domain' => $domain, 'API Key' => $this->format->obfusc($api_key));
             $this->log->warning($log_message, $log_extra);

@@ -3,7 +3,7 @@
  * /raw.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -38,12 +38,12 @@ $pdo = $deeb->cnxx;
 
 if ($_SESSION['s_raw_list_type'] == 'domains') {
 
-    $page_title = "Domains (Raw List)";
+    $page_title = _('Domains (Raw List)');
     $software_section = "domains";
 
 } elseif ($_SESSION['s_raw_list_type'] == 'ssl-certs') {
 
-    $page_title = "SSL Certificates (Raw List)";
+    $page_title = _('SSL Certificates (Raw List)');
     $software_section = "ssl-certs";
 
 }
@@ -54,7 +54,7 @@ if ($_SESSION['s_raw_list_type'] == 'domains') {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body>
+<body class="hold-transition text-sm<?php echo $layout->bodyDarkMode(); ?>">
 <?php
 $result = $pdo->query($_SESSION['s_raw_list_query'])->fetchAll();
 

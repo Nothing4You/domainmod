@@ -3,7 +3,7 @@
  * /maintenance/index.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -41,11 +41,13 @@ $system->authCheck();
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
-<a href="update-conversions.php">Update Conversion Rates</a><BR><BR>
-<a href="update-domain-fees.php">Update Domain Fees</a><BR><BR>
-<a href="update-ssl-fees.php">Update SSL Fees</a><BR>
+<?php echo $layout->contentBoxTop(_('Maintenance Tasks'), '3'); ?>
+<a href="update-conversions.php"><?php echo _('Update Conversion Rates'); ?></a><BR><BR>
+<a href="update-domain-fees.php"><?php echo _('Update Domain Fees'); ?></a><BR><BR>
+<a href="update-ssl-fees.php"><?php echo _('Update SSL Fees'); ?></a><BR>
+<?php echo $layout->contentBoxBottom(); ?>
 <?php //@formatter:on ?>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
 </body>

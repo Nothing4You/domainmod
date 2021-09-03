@@ -3,7 +3,7 @@
  * /assets/edit/ssl-provider-account.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -35,6 +35,7 @@ $form = new DomainMOD\Form();
 $assets = new DomainMOD\Assets();
 $sanitize = new DomainMOD\Sanitize();
 $unsanitize = new DomainMOD\Unsanitize();
+$validate = new DomainMOD\Validate();
 
 require_once DIR_INC . '/head.inc.php';
 require_once DIR_INC . '/debug.inc.php';
@@ -44,7 +45,6 @@ $system->authCheck();
 $pdo = $deeb->cnxx;
 
 $del = (int) $_GET['del'];
-$really_del = (int) $_GET['really_del'];
 
 $sslpaid = (int) $_GET['sslpaid'];
 $new_owner_id = (int) $_POST['new_owner_id'];
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $system->readOnlyCheck($_SERVER['HTTP_REFERER']);
 
-    if ($new_username != "" && $new_owner_id !== 0 && $new_ssl_provider_id !== 0) {
+    if ($validate->text($new_username) && $new_owner_id !== 0 && $new_ssl_provider_id !== 0) {
 
         try {
 
@@ -92,6 +92,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bindValue('new_sslpaid', $new_sslpaid, PDO::PARAM_INT);
             $stmt->execute();
 
+            $stmt = $pdo->prepare("
+                UPDATE ssl_certs
+                SET owner_id = :new_owner_id,
+                    ssl_provider_id = :new_ssl_provider_id
+                WHERE account_id = :new_sslpaid");
+            $stmt->bindValue('new_owner_id', $new_owner_id, PDO::PARAM_INT);
+            $stmt->bindValue('new_ssl_provider_id', $new_ssl_provider_id, PDO::PARAM_INT);
+            $stmt->bindValue('new_sslpaid', $new_sslpaid, PDO::PARAM_INT);
+            $stmt->execute();
+
             $sslpaid = $new_sslpaid;
 
             $temp_ssl_provider = $assets->getSslProvider($new_ssl_provider_id);
@@ -99,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $pdo->commit();
 
-            $_SESSION['s_message_success'] .= "SSL Account " . $new_username . " (" . $temp_ssl_provider . ", " . $temp_owner . ") updated<BR>";
+            $_SESSION['s_message_success'] .= sprintf(_('SSL Account %s (%s, %s) updated'), $new_username, $temp_ssl_provider, $temp_owner) . '<BR>';
 
             header("Location: ../ssl-accounts.php");
             exit;
@@ -122,18 +132,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($new_owner_id === 0) {
 
-            $_SESSION['s_message_danger'] .= "Choose the Owner<BR>";
+            $_SESSION['s_message_danger'] .= _('Choose the Owner') . '<BR>';
 
         }
 
         if ($new_ssl_provider_id === 0) {
 
-            $_SESSION['s_message_danger'] .= "Choose the SSL Provider<BR>";
+            $_SESSION['s_message_danger'] .= _('Choose the SSL Provider') . '<BR>';
 
         }
 
-        if ($new_username == "") {
-            $_SESSION['s_message_danger'] .= "Enter a username<BR>";
+        if (!$validate->text($new_username)) {
+            $_SESSION['s_message_danger'] .= _('Enter a username') . '<BR>';
         }
 
     }
@@ -183,51 +193,43 @@ if ($del === 1) {
 
     if ($existing_ssl_certs > 0) {
 
-        $_SESSION['s_message_danger'] .= "This SSL Account has SSL certificates associated with it and cannot be
-        deleted<BR>";
+        $_SESSION['s_message_danger'] .= _('This SSL Account has SSL certificates associated with it and cannot be deleted') . '<BR>';
 
     } else {
 
-        $_SESSION['s_message_danger'] .= "Are you sure you want to delete this SSL Account?<BR><BR><a
-            href=\"ssl-provider-account.php?sslpaid=" . $sslpaid . "&really_del=1\">YES, REALLY DELETE THIS SSL PROVIDER ACCOUNT</a><BR>";
+        $stmt = $pdo->prepare("
+            SELECT a.username AS username, o.name AS owner_name, p.name AS ssl_provider_name
+            FROM ssl_accounts AS a, owners AS o, ssl_providers AS p
+            WHERE a.owner_id = o.id
+              AND a.ssl_provider_id = p.id
+              AND a.id = :sslpaid");
+        $stmt->bindValue('sslpaid', $sslpaid, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch();
+        $stmt->closeCursor();
+
+        if ($result) {
+
+            $temp_username = $result->username;
+            $temp_owner_name = $result->owner_name;
+            $temp_ssl_provider_name = $result->ssl_provider_name;
+
+        }
+
+        $stmt = $pdo->prepare("
+            DELETE FROM ssl_accounts
+            WHERE id = :sslpaid");
+        $stmt->bindValue('sslpaid', $sslpaid, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $_SESSION['s_message_success'] .= sprintf(_('SSL Account %s (%s, %s) deleted'), $temp_username, $temp_ssl_provider_name, $temp_owner_name) . '<BR>';
+
+        $system->checkExistingAssets();
+
+        header("Location: ../ssl-accounts.php");
+        exit;
 
     }
-
-}
-
-if ($really_del === 1) {
-
-    $stmt = $pdo->prepare("
-        SELECT a.username AS username, o.name AS owner_name, p.name AS ssl_provider_name
-        FROM ssl_accounts AS a, owners AS o, ssl_providers AS p
-        WHERE a.owner_id = o.id
-          AND a.ssl_provider_id = p.id
-          AND a.id = :sslpaid");
-    $stmt->bindValue('sslpaid', $sslpaid, PDO::PARAM_INT);
-    $stmt->execute();
-    $result = $stmt->fetch();
-    $stmt->closeCursor();
-
-    if ($result) {
-
-        $temp_username = $result->username;
-        $temp_owner_name = $result->owner_name;
-        $temp_ssl_provider_name = $result->ssl_provider_name;
-
-    }
-
-    $stmt = $pdo->prepare("
-        DELETE FROM ssl_accounts
-        WHERE id = :sslpaid");
-    $stmt->bindValue('sslpaid', $sslpaid, PDO::PARAM_INT);
-    $stmt->execute();
-
-    $_SESSION['s_message_success'] .= "SSL Account " . $temp_username . " (" . $temp_ssl_provider_name . ", " . $temp_owner_name . ") Deleted<BR>";
-
-    $system->checkExistingAssets();
-
-    header("Location: ../ssl-accounts.php");
-    exit;
 
 }
 ?>
@@ -237,7 +239,7 @@ if ($really_del === 1) {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 echo $form->showFormTop('');
@@ -249,7 +251,7 @@ $result = $pdo->query("
 
 if ($result) {
 
-    echo $form->showDropdownTop('new_ssl_provider_id', 'SSL Provider', '', '1', '');
+    echo $form->showDropdownTop('new_ssl_provider_id', _('SSL Provider'), '', '1', '');
 
     foreach ($result as $row) {
 
@@ -268,7 +270,7 @@ $result = $pdo->query("
 
 if ($result) {
 
-    echo $form->showDropdownTop('new_owner_id', 'Account Owner', '', '1', '');
+    echo $form->showDropdownTop('new_owner_id', _('Account Owner'), '', '1', '');
 
     foreach ($result as $row) {
 
@@ -280,21 +282,21 @@ if ($result) {
 
 }
 
-echo $form->showInputText('new_email_address', 'Email Address (100)', '', $unsanitize->text($new_email_address), '100', '', '', '', '');
-echo $form->showInputText('new_username', 'Username (100)', '', $unsanitize->text($new_username), '100', '', '1', '', '');
-echo $form->showInputText('new_password', 'Password (255)', '', $unsanitize->text($new_password), '255', '', '', '', '');
-echo $form->showRadioTop('Reseller Account?', '', '');
-echo $form->showRadioOption('new_reseller', '1', 'Yes', $new_reseller, '<BR>', '&nbsp;&nbsp;&nbsp;&nbsp;');
-echo $form->showRadioOption('new_reseller', '0', 'No', $new_reseller, '', '');
+echo $form->showInputText('new_email_address', _('Email Address') . ' (100)', '', $unsanitize->text($new_email_address), '100', '', '', '', '');
+echo $form->showInputText('new_username', _('Username') . ' (100)', '', $unsanitize->text($new_username), '100', '', '1', '', '');
+echo $form->showInputText('new_password', _('Password') . ' (255)', '', $unsanitize->text($new_password), '255', '', '', '', '');
+echo $form->showRadioTop(_('Reseller Account') . '?', '', '');
+echo $form->showRadioOption('new_reseller', '1', _('Yes'), $new_reseller, '<BR>', '&nbsp;&nbsp;&nbsp;&nbsp;');
+echo $form->showRadioOption('new_reseller', '0', _('No'), $new_reseller, '', '');
 echo $form->showRadioBottom('');
-echo $form->showInputText('new_reseller_id', 'Reseller ID (100)', '', $unsanitize->text($new_reseller_id), '100', '', '', '', '');
-echo $form->showInputTextarea('new_notes', 'Notes', '', $unsanitize->text($new_notes), '', '', '');
+echo $form->showInputText('new_reseller_id', _('Reseller ID') . ' (100)', '', $unsanitize->text($new_reseller_id), '100', '', '', '', '');
+echo $form->showInputTextarea('new_notes', _('Notes'), '', $unsanitize->text($new_notes), '', '', '');
 echo $form->showInputHidden('new_sslpaid', $sslpaid);
-echo $form->showSubmitButton('Save', '', '');
+echo $form->showSubmitButton(_('Save'), '', '');
 echo $form->showFormBottom('');
+
+$layout->deleteButton(_('SSL Provider Account'), $new_username, 'ssl-provider-account.php?sslpaid=' . $sslpaid . '&del=1');
 ?>
-<BR><a href="ssl-provider-account.php?sslpaid=<?php echo $sslpaid; ?>&del=1">DELETE THIS SSL PROVIDER
-    ACCOUNT</a>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
 </body>
 </html>

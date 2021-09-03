@@ -3,7 +3,7 @@
  * /classes/DomainMOD/Log.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -32,9 +32,14 @@ class Log
     {
         $this->area = $area;
         $this->time = new Time();
-        $this->url = $_SERVER['REQUEST_URI'];
 
-        if ($_SESSION['s_user_id']) {
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $this->url = $_SERVER['REQUEST_URI'];
+        } else {
+            $this->url = '';
+        }
+
+        if (isset($_SESSION['s_user_id'])) {
             $this->user_id = $_SESSION['s_user_id'];
         } else {
             $this->user_id = 0;
@@ -71,7 +76,7 @@ class Log
     {
         $extra_info_formatted = '';
         $last_error = error_get_last();
-        $last_error_message = array('Last Error' => $last_error['message']);
+        $last_error_message = array(_('Last Error') => $last_error['message']);
         $merged_array = array_merge($last_error_message, $extra_info);
         foreach ($merged_array as $key => $value) {
             $extra_info_formatted .= '"' . $key . '":"' . $value . '", ';

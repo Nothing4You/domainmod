@@ -3,7 +3,7 @@
  * /reporting/domains/registrar-fees.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -81,11 +81,11 @@ if ($total_rows > 0) {
 
         if ($all == "1") {
 
-            $export_file = $export->openFile('registrar_fee_report_all', strtotime($time->stamp()));
+            $export_file = $export->openFile(_('registrar_fee_report_all'), strtotime($time->stamp()));
 
         } else {
 
-            $export_file = $export->openFile('registrar_fee_report_active', strtotime($time->stamp()));
+            $export_file = $export->openFile(_('registrar_fee_report_active'), strtotime($time->stamp()));
 
         }
 
@@ -96,11 +96,11 @@ if ($total_rows > 0) {
 
         if ($all == "1") {
 
-            $row_contents = array('All Registrar Fees');
+            $row_contents = array(_('All Registrar Fees'));
 
         } else {
 
-            $row_contents = array('Active Registrar Fees');
+            $row_contents = array(_('Active Registrar Fees'));
 
         }
         $export->writeRow($export_file, $row_contents);
@@ -108,17 +108,17 @@ if ($total_rows > 0) {
         $export->writeBlankRow($export_file);
 
         $row_contents = array(
-            'Registrar',
-            'TLD',
-            'Initial Fee',
-            'Renewal Fee',
-            'Transfer Fee',
-            'Privacy Fee',
-            'Misc Fee',
-            'Currency',
-            'Domains',
-            'Inserted',
-            'Updated'
+            _('Registrar'),
+            _('TLD'),
+            _('Initial Fee'),
+            _('Renewal Fee'),
+            _('Transfer Fee'),
+            _('Privacy Fee'),
+            _('Misc Fee'),
+            _('Currency'),
+            _('Domains'),
+            _('Inserted'),
+            _('Updated')
         );
         $export->writeRow($export_file, $row_contents);
 
@@ -189,12 +189,13 @@ if ($total_rows > 0) {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
-<a href="registrar-fees.php?all=1"><?php echo $layout->showButton('button', 'View All'); ?></a>&nbsp;&nbsp;or&nbsp;<a href="registrar-fees.php?all=0"><?php echo $layout->showButton('button', 'Active Only'); ?></a>
 <?php if ($total_rows > 0) { //@formatter:off ?>
-          <BR><BR><a href="registrar-fees.php?export_data=1&all=<?php echo urlencode($all); ?>"><?php echo $layout->showButton('button', 'Export'); ?></a>
+    <a href="registrar-fees.php?export_data=1&all=<?php echo urlencode($all); ?>"><?php echo $layout->showButton('button', _('Export Report')); ?></a><BR><BR>
 <?php } //@formatter:on ?>
+
+<a href="registrar-fees.php?all=1"><?php echo $layout->showButton('button', _('View All')); ?></a>&nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;<a href="registrar-fees.php?all=0"><?php echo $layout->showButton('button', _('Active Only')); ?></a><BR><BR>
 
 <?php if ($total_rows > 0) { ?>
 
@@ -202,16 +203,16 @@ if ($total_rows > 0) {
         <thead>
         <tr>
             <th width="20px"></th>
-            <th>Registrar</th>
-            <th>TLD</th>
-            <th>Initial</th>
-            <th>Renewal</th>
-            <th>Transfer</th>
-            <th>Privacy</th>
-            <th>Misc</th>
-            <th>Currency</th>
-            <th>Domains</th>
-            <th>Last Updated</th>
+            <th><?php echo _('Registrar'); ?></th>
+            <th><?php echo _('TLD'); ?></th>
+            <th><?php echo _('Initial'); ?></th>
+            <th><?php echo _('Renewal'); ?></th>
+            <th><?php echo _('Transfer'); ?></th>
+            <th><?php echo _('Privacy'); ?></th>
+            <th><?php echo _('Misc'); ?></th>
+            <th><?php echo _('Currency'); ?></th>
+            <th><?php echo _('Domains'); ?></th>
+            <th><?php echo _('Last Updated'); ?></th>
         </tr>
         </thead>
         <tbody><?php

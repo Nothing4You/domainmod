@@ -3,7 +3,7 @@
  * /classes/DomainMOD/Scheduler.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -108,11 +108,11 @@ class Scheduler
 
     public function createActive($active, $task_id)
     {
-        $result = '<strong><font color=\'green\'>Active</font></strong> [<a href=\'update.php?a=d&id=' . $task_id .
-            '\'>disable</a>] [<a href=\'run.php?id=' . $task_id . '\'>run now</a>]';
+        $result = '<strong><font color=\'green\'>' . _('Active') . '</font></strong> [<a href=\'update.php?a=d&id=' . $task_id .
+            '\'>' . strtolower(_('Disable')) . '</a>] [<a href=\'run.php?id=' . $task_id . '\'>' . strtolower(_('Run Now')) . '</a>]';
         if ($active == '0') {
-            $result = '<strong><font color=\'red\'>Inactive</font></strong> [<a href=\'update.php?a=e&id=' . $task_id .
-                '\'>enable</a>] [<a href=\'run.php?id=' . $task_id . '\'>run now</a>]';
+            $result = '<strong><font color=\'red\'>' . _('Inactive') . '</font></strong> [<a href=\'update.php?a=e&id=' . $task_id .
+                '\'>' . strtolower(_('Enable')) . '</a>] [<a href=\'run.php?id=' . $task_id . '\'>' . strtolower(_('Run Now')) . '</a>]';
         }
         return $result;
     }

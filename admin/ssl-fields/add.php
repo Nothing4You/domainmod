@@ -3,7 +3,7 @@
  * /admin/ssl-fields/add.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_name != '' && $new_field_name !
 
     if ($result_main) {
 
-        $_SESSION['s_message_danger'] .= 'The Database Field Name you entered already exists<BR>';
+        $_SESSION['s_message_danger'] .= _('The Database Field Name you entered already exists') . '<BR>';
 
     } else {
 
@@ -111,6 +111,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_name != '' && $new_field_name !
                 $sql = "ALTER TABLE `ssl_cert_field_data`
                         ADD `" . $new_field_name . "` DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00'";
 
+            } elseif ($new_field_type_id === 6) { // URL
+
+                $sql = "ALTER TABLE `ssl_cert_field_data`
+                        ADD `" . $new_field_name . "` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL";
+
             }
 
             $pdo->query($sql);
@@ -123,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_name != '' && $new_field_name !
 
             $_SESSION['s_csf_data'] = $custom_field->getCSFData();
 
-            $_SESSION['s_message_success'] .= 'Custom SSL Field ' . $new_name . ' (' . $new_field_name . ') added<BR>';
+            $_SESSION['s_message_success'] .= sprintf(_('Custom SSL Field %s (%s) added'), $new_name, $new_field_name) . '<BR>';
 
             header("Location: ../ssl-fields/");
             exit;
@@ -148,8 +153,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_name != '' && $new_field_name !
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-        if ($new_name == '') $_SESSION['s_message_danger'] .= 'Enter the Display Name<BR>';
-        if (!$custom_field->checkFieldFormat($new_field_name)) $_SESSION['s_message_danger'] .= 'The Database Field Name format is incorrect<BR>';
+        if ($new_name == '') $_SESSION['s_message_danger'] .= _('Enter the Display Name') . '<BR>';
+        if (!$custom_field->checkFieldFormat($new_field_name)) $_SESSION['s_message_danger'] .= _('The Database Field Name format is incorrect') . '<BR>';
 
     }
 
@@ -161,12 +166,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_name != '' && $new_field_name !
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 echo $form->showFormTop('');
-echo $form->showInputText('new_name', 'Display Name (75)', '', $unsanitize->text($new_name), '75', '', '1', '', '');
-echo $form->showInputText('new_field_name', 'Database Field Name (30)', 'The Database Field Name can contain only letters and underscores (ie. sample_field or SampleField).<BR><strong>WARNING:</strong> The Database Field Name cannot be renamed.', $unsanitize->text($new_field_name), '30', '', '1', '', '');
+echo $form->showInputText('new_name', _('Display Name') . ' (75)', '', $unsanitize->text($new_name), '75', '', '1', '', '');
+echo $form->showInputText('new_field_name', _('Database Field Name') . ' (30)', _('The Database Field Name can contain only letters and underscores (ie. sample_field or SampleField).') . '<BR><strong>' . strtoupper(_('Warning')) . ':</strong> ' . _('The Database Field Name cannot be renamed.'), $unsanitize->text($new_field_name), '30', '', '1', '', '');
 
 $result = $pdo->query("
     SELECT id, `name`
@@ -175,7 +180,7 @@ $result = $pdo->query("
 
 if ($result) {
 
-    echo $form->showDropdownTop('new_field_type_id', 'Data Type', '<strong>WARNING:</strong> The Data Type cannot be changed.', '', '');
+    echo $form->showDropdownTop('new_field_type_id', _('Data Type'), '<strong>' . strtoupper(_('Warning')) . ':</strong> ' . _('The Data Type cannot be changed.'), '', '');
 
     foreach ($result as $row) {
 
@@ -187,9 +192,9 @@ if ($result) {
 
 }
 
-echo $form->showInputText('new_description', 'Description (255)', '', $unsanitize->text($new_description), '255', '', '', '', '');
-echo $form->showInputTextarea('new_notes', 'Notes', '', $unsanitize->text($new_notes), '', '', '');
-echo $form->showSubmitButton('Add Custom Field', '', '');
+echo $form->showInputText('new_description', _('Description') . ' (255)', '', $unsanitize->text($new_description), '255', '', '', '', '');
+echo $form->showInputTextarea('new_notes', _('Notes'), '', $unsanitize->text($new_notes), '', '', '');
+echo $form->showSubmitButton(_('Add Custom Field'), '', '');
 echo $form->showFormBottom('');
 ?>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; //@formatter:on ?>

@@ -3,7 +3,7 @@
  * /assets/edit/account-owner.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -33,6 +33,7 @@ $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
 $sanitize = new DomainMOD\Sanitize();
 $unsanitize = new DomainMOD\Unsanitize();
+$validate = new DomainMOD\Validate();
 
 require_once DIR_INC . '/head.inc.php';
 require_once DIR_INC . '/debug.inc.php';
@@ -42,7 +43,6 @@ $system->authCheck();
 $pdo = $deeb->cnxx;
 
 $del = (int) $_GET['del'];
-$really_del = (int) $_GET['really_del'];
 
 $oid = (int) $_GET['oid'];
 
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $system->readOnlyCheck($_SERVER['HTTP_REFERER']);
 
-    if ($new_owner != "") {
+    if ($validate->text($new_owner)) {
 
         $stmt = $pdo->prepare("
             UPDATE owners
@@ -71,14 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $oid = $new_oid;
 
-        $_SESSION['s_message_success'] .= "Owner " . $new_owner . " Updated<BR>";
+        $_SESSION['s_message_success'] .= sprintf(_('Owner %s updated'), $new_owner) . '<BR>';
 
         header("Location: ../account-owners.php");
         exit;
 
     } else {
 
-        $_SESSION['s_message_danger'] .= "Enter the owner's name<BR>";
+        $_SESSION['s_message_danger'] .= _("Enter the owner's name") . '<BR>';
 
     }
 
@@ -169,44 +169,35 @@ if ($del === 1) {
     ) {
 
         if ($existing_registrar_accounts > 0) {
-            $_SESSION['s_message_danger'] .= "This Owner has registrar accounts associated with it and cannot be
-                deleted<BR>";
+            $_SESSION['s_message_danger'] .= _('This Owner has registrar accounts associated with it and cannot be deleted') . '<BR>';
         }
 
         if ($existing_domains > 0) {
-            $_SESSION['s_message_danger'] .= "This Owner has domains associated with it and cannot be deleted<BR>";
+            $_SESSION['s_message_danger'] .= _('This Owner has domains associated with it and cannot be deleted') . '<BR>';
         }
 
         if ($existing_ssl_accounts > 0) {
-            $_SESSION['s_message_danger'] .= "This Owner has SSL accounts associated with it and cannot be deleted<BR>";
+            $_SESSION['s_message_danger'] .= _('This Owner has SSL accounts associated with it and cannot be deleted') . '<BR>';
         }
 
         if ($existing_ssl_certs > 0) {
-            $_SESSION['s_message_danger'] .= "This Owner has SSL certificates associated with it and cannot be
-                deleted<BR>";
+            $_SESSION['s_message_danger'] .= _('This Owner has SSL certificates associated with it and cannot be deleted') . '<BR>';
         }
 
     } else {
 
-        $_SESSION['s_message_danger'] .= 'Are you sure you want to delete this Owner?<BR><BR><a
-            href="account-owner.php?oid=' . $oid . '&really_del=1">YES, REALLY DELETE THIS OWNER</a><BR>';
+        $stmt = $pdo->prepare("
+            DELETE FROM owners
+            WHERE id = :oid");
+        $stmt->bindValue('oid', $oid, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $_SESSION['s_message_success'] .= sprintf(_('Owner %s deleted'), $new_owner) . '<BR>';
+
+        header("Location: ../account-owners.php");
+        exit;
 
     }
-
-}
-
-if ($really_del === 1) {
-
-    $stmt = $pdo->prepare("
-        DELETE FROM owners
-        WHERE id = :oid");
-    $stmt->bindValue('oid', $oid, PDO::PARAM_INT);
-    $stmt->execute();
-
-    $_SESSION['s_message_success'] .= "Owner " . $new_owner . " Deleted<BR>";
-
-    header("Location: ../account-owners.php");
-    exit;
 
 }
 ?>
@@ -216,17 +207,18 @@ if ($really_del === 1) {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 echo $form->showFormTop('');
-echo $form->showInputText('new_owner', 'Owner Name (100)', '', $unsanitize->text($new_owner), '100', '', '1', '', '');
-echo $form->showInputTextarea('new_notes', 'Notes', '', $unsanitize->text($new_notes), '', '', '');
+echo $form->showInputText('new_owner', _('Owner Name') . ' (100)', '', $unsanitize->text($new_owner), '100', '', '1', '', '');
+echo $form->showInputTextarea('new_notes', _('Notes'), '', $unsanitize->text($new_notes), '', '', '');
 echo $form->showInputHidden('new_oid', $oid);
-echo $form->showSubmitButton('Save', '', '');
+echo $form->showSubmitButton(_('Save'), '', '');
 echo $form->showFormBottom('');
+
+$layout->deleteButton(_('Owner'), $new_owner, 'account-owner.php?oid=' . $oid . '&del=1');
 ?>
-<BR><a href="account-owner.php?oid=<?php echo $oid; ?>&del=1">DELETE THIS OWNER</a>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
 </body>
 </html>

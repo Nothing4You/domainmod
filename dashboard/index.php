@@ -3,7 +3,7 @@
  * /dashboard/index.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -45,54 +45,8 @@ $pdo = $deeb->cnxx;
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini" onLoad="document.forms[0].elements[0].focus()">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
-<?php
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// System Totals
-////////////////////////////////////////////////////////////////////////////////////////////////////
-?>
-<div class="row">
-
-    <h3 style="padding-left:20px;">System Totals</h3>
-
-    <?php
-    //////////////////////////////////////////////////
-    // Active Domains
-    //////////////////////////////////////////////////
-    $total_count = $pdo->query("
-        SELECT count(*)
-        FROM domains
-        WHERE active NOT IN ('0', '10')")->fetchColumn();
-
-    echo $dashboard->displayPanel('Domains', $total_count, 'green', 'checkmark-circled', '/domains/index.php?is_active=LIVE');
-
-    //////////////////////////////////////////////////
-    // Active SSL Certificates
-    //////////////////////////////////////////////////
-    $total_count = $pdo->query("
-        SELECT count(*)
-        FROM ssl_certs
-        WHERE active NOT IN ('0', '10')")->fetchColumn();
-
-    echo $dashboard->displayPanel('SSL Certificates', $total_count, 'green', 'checkmark-circled', '/ssl/index.php?is_active=LIVE');
-
-    //////////////////////////////////////////////////
-    // Sold Domains
-    //////////////////////////////////////////////////
-    $total_count = $pdo->query("
-        SELECT count(*)
-        FROM domains
-        WHERE active = '10'")->fetchColumn();
-
-    if ($total_count) {
-
-        echo $dashboard->displayPanel('Sold Domains', $total_count, 'aqua', 'android-cart', '/domains/index.php?is_active=10');
-
-    } ?>
-
-</div>
-
 <?php
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Expiration Panels
@@ -121,45 +75,94 @@ $total_count_ssl = $pdo->query("
 if ($total_count_domains || $total_count_ssl) { ?>
 
     <div class="row">
+        <h4>&nbsp;&nbsp;<?php echo sprintf(ngettext('Expiring in the next day', 'Expiring in the next %s days', $expiration_days), $expiration_days); ?></h4>
+    </div>
 
-        <h3 style="padding-left:20px;">Expiring in the next <?php echo $expiration_days; ?> days</h3>
+    <div class="row">
 
-        <?php
-        //////////////////////////////////////////////////
-        // Expiring Domains
-        //////////////////////////////////////////////////
-        $total_count = $pdo->query("
+    <?php
+    //////////////////////////////////////////////////
+    // Expiring Domains
+    //////////////////////////////////////////////////
+    $total_count = $pdo->query("
                 SELECT count(*)
                 FROM domains
                 WHERE active NOT IN ('0', '10')
                   AND expiry_date <= '" . $end_date . "'")->fetchColumn();
 
-        if ($total_count) {
+    if ($total_count) {
 
-            echo $dashboard->displayPanel('Domains', $total_count, 'red', 'close-circled', '/domains/index.php?daterange=' . urlencode($daterange));
+        echo $dashboard->displayExpPanel(_('Domains'), $total_count, '/domains/index.php?daterange=' . urlencode($daterange));
 
-        }
+    }
 
-        //////////////////////////////////////////////////
-        // Expiring SSL Certificates
-        //////////////////////////////////////////////////
-        $total_count = $pdo->query("
+    //////////////////////////////////////////////////
+    // Expiring SSL Certificates
+    //////////////////////////////////////////////////
+    $total_count = $pdo->query("
                 SELECT count(*)
                 FROM ssl_certs AS sslc, ssl_cert_types AS sslt
                 WHERE sslc.type_id = sslt.id
                   AND sslc.active NOT IN ('0')
                   AND sslc.expiry_date <= '" . $end_date . "'")->fetchColumn();
 
-        if ($total_count) {
+    if ($total_count) {
 
-            echo $dashboard->displayPanel('SSL Certificates', $total_count, 'red', 'close-circled', '/ssl/index.php?daterange=' . urlencode($daterange));
+        echo $dashboard->displayExpPanel(_('SSL Certs'), $total_count, '/ssl/index.php?daterange=' . urlencode($daterange));
 
-        } ?>
+    } ?>
 
     </div><?php
 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// System Totals
+////////////////////////////////////////////////////////////////////////////////////////////////////
+?>
+<div class="row">
+    <h4>&nbsp;&nbsp;<?php echo _('System Totals'); ?></h4>
+</div>
+
+<div class="row">
+
+    <?php
+    //////////////////////////////////////////////////
+    // Active Domains
+    //////////////////////////////////////////////////
+    $total_count = $pdo->query("
+        SELECT count(*)
+        FROM domains
+        WHERE active NOT IN ('0', '10')")->fetchColumn();
+
+    echo $dashboard->displayPanel(_('Domains'), $total_count, 'green', 'checkmark-circled', '/domains/index.php?is_active=LIVE');
+
+    //////////////////////////////////////////////////
+    // Active SSL Certificates
+    //////////////////////////////////////////////////
+    $total_count = $pdo->query("
+        SELECT count(*)
+        FROM ssl_certs
+        WHERE active NOT IN ('0', '10')")->fetchColumn();
+
+    echo $dashboard->displayPanel(_('SSL Certificates'), $total_count, 'green', 'checkmark-circled', '/ssl/index.php?is_active=LIVE');
+
+    //////////////////////////////////////////////////
+    // Sold Domains
+    //////////////////////////////////////////////////
+    $total_count = $pdo->query("
+        SELECT count(*)
+        FROM domains
+        WHERE active = '10'")->fetchColumn();
+
+    if ($total_count) {
+
+        echo $dashboard->displayPanel(_('Sold Domains'), $total_count, 'info', 'android-cart', '/domains/index.php?is_active=10');
+
+    } ?>
+
+</div>
+<?php
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Domain Queue
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,8 +186,10 @@ $total_count_finished = $pdo->query("
 if ($total_count_processing || $total_count_pending || $total_count_finished) { ?>
 
     <div class="row">
+        <h4><?php echo _('Domain Queue'); ?></h4>
+    </div>
 
-        <h3 style="padding-left:20px;">Domain Queue</h3>
+    <div class="row">
 
         <?php
         //////////////////////////////////////////////////
@@ -192,7 +197,7 @@ if ($total_count_processing || $total_count_pending || $total_count_finished) { 
         //////////////////////////////////////////////////
         if ($total_count_pending) {
 
-            echo $dashboard->displayPanel('Pending', $total_count_pending, 'yellow', 'clock', '/queue/');
+            echo $dashboard->displayPanel(_('Pending'), $total_count_pending, 'yellow', 'clock', '/queue/');
 
         }
 
@@ -201,7 +206,7 @@ if ($total_count_processing || $total_count_pending || $total_count_finished) { 
         //////////////////////////////////////////////////
         if ($total_count_processing) {
 
-            echo $dashboard->displayPanel('Processing', $total_count_processing, 'yellow', 'clock', '/queue/');
+            echo $dashboard->displayPanel(_('Processing'), $total_count_processing, 'yellow', 'clock', '/queue/');
 
         }
 
@@ -210,7 +215,7 @@ if ($total_count_processing || $total_count_pending || $total_count_finished) { 
         //////////////////////////////////////////////////
         if ($total_count_finished) {
 
-            echo $dashboard->displayPanel('Finished', $total_count_finished, 'green', 'checkmark-circled', '/queue/');
+            echo $dashboard->displayPanel(_('Finished'), $total_count_finished, 'green', 'checkmark-circled', '/queue/');
 
         } ?>
 
@@ -228,8 +233,10 @@ $total_count = $pdo->query("
 if ($total_count) { ?>
 
     <div class="row">
+        <h4>&nbsp;&nbsp;<?php echo _('Pending (Domains)'); ?></h4>
+    </div>
 
-        <h3 style="padding-left:20px;">Pending (Domains)</h3>
+    <div class="row">
 
         <?php
         //////////////////////////////////////////////////
@@ -242,7 +249,7 @@ if ($total_count) { ?>
 
         if ($total_count) {
 
-            echo $dashboard->displayPanel('Pending Renewals', $total_count, 'red', 'clock', '/domains/index.php?is_active=3');
+            echo $dashboard->displayPanel(_('Pending Renewals'), $total_count, 'red', 'clock', '/domains/index.php?is_active=3');
 
         } ?>
 
@@ -257,7 +264,7 @@ if ($total_count) { ?>
 
         if ($total_count) {
 
-            echo $dashboard->displayPanel('Pending Registrations', $total_count, 'yellow', 'clock', '/domains/index.php?is_active=5');
+            echo $dashboard->displayPanel(_('Pending Registrations'), $total_count, 'yellow', 'clock', '/domains/index.php?is_active=5');
 
         }
 
@@ -271,7 +278,7 @@ if ($total_count) { ?>
 
         if ($total_count) {
 
-            echo $dashboard->displayPanel('Pending Transfers', $total_count, 'aqua', 'clock', '/domains/index.php?is_active=2');
+            echo $dashboard->displayPanel(_('Pending Transfers'), $total_count, 'info', 'clock', '/domains/index.php?is_active=2');
 
         }
 
@@ -285,7 +292,7 @@ if ($total_count) { ?>
 
         if ($total_count) {
 
-            echo $dashboard->displayPanel('Pending (Other)', $total_count, 'green', 'clock', '/domains/index.php?is_active=4');
+            echo $dashboard->displayPanel(_('Pending (Other)'), $total_count, 'green', 'clock', '/domains/index.php?is_active=4');
 
         } ?>
 
@@ -304,8 +311,10 @@ $total_count = $pdo->query("
 if ($total_count) { ?>
 
     <div class="row">
+        <h4>&nbsp;&nbsp;<?php echo _('Pending (SSL Certificates)'); ?></h4>
+    </div>
 
-        <h3 style="padding-left:20px;">Pending (SSL Certificates)</h3>
+    <div class="row">
 
         <?php
         //////////////////////////////////////////////////
@@ -318,7 +327,7 @@ if ($total_count) { ?>
 
         if ($total_count) {
 
-            echo $dashboard->displayPanel('Pending Renewals', $total_count, 'red', 'clock', '/ssl/index.php?is_active=3');
+            echo $dashboard->displayPanel(_('Pending Renewals'), $total_count, 'red', 'clock', '/ssl/index.php?is_active=3');
 
         }
 
@@ -332,7 +341,7 @@ if ($total_count) { ?>
 
         if ($total_count) {
 
-            echo $dashboard->displayPanel('Pending Registrations', $total_count, 'yellow', 'clock', '/ssl/index.php?is_active=5');
+            echo $dashboard->displayPanel(_('Pending Registrations'), $total_count, 'yellow', 'clock', '/ssl/index.php?is_active=5');
 
         }
 
@@ -346,7 +355,7 @@ if ($total_count) { ?>
 
         if ($total_count) {
 
-            echo $dashboard->displayPanel('Pending (Other)', $total_count, 'green', 'clock', '/ssl/index.php?is_active=4');
+            echo $dashboard->displayPanel(_('Pending (Other)'), $total_count, 'green', 'clock', '/ssl/index.php?is_active=4');
 
         } ?>
 

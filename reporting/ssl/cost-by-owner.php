@@ -3,7 +3,7 @@
  * /reporting/ssl/cost-by-owner.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -34,6 +34,8 @@ $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
 $reporting = new DomainMOD\Reporting();
 $currency = new DomainMOD\Currency();
+$sanitize = new DomainMOD\Sanitize();
+$unsanitize = new DomainMOD\Unsanitize();
 
 require_once DIR_INC . '/head.inc.php';
 require_once DIR_INC . '/debug.inc.php';
@@ -43,7 +45,7 @@ $system->authCheck();
 $pdo = $deeb->cnxx;
 
 $export_data = (int) $_GET['export_data'];
-$daterange = $_REQUEST['daterange'];
+$daterange = $sanitize->text($_REQUEST['daterange']);
 
 list($new_start_date, $new_end_date) = $date->splitAndCheckRange($daterange);
 
@@ -53,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($new_start_date > $new_end_date) {
 
-        $_SESSION['s_message_danger'] .= 'The end date proceeds the start date<BR>';
+        $_SESSION['s_message_danger'] .= _('The end date proceeds the start date') . '<BR>';
         $submission_failed = '1';
 
     }
@@ -106,12 +108,12 @@ if ($submission_failed != '1' && $total_rows > 0) {
 
         if ($daterange == '') {
 
-            $export_file = $export->openFile('ssl_cost_by_owner_report_all', strtotime($time->stamp()));
+            $export_file = $export->openFile(_('ssl_cost_by_owner_report_all'), strtotime($time->stamp()));
 
         } else {
 
             $export_file = $export->openFile(
-                'ssl_cost_by_owner_report',
+                _('ssl_cost_by_owner_report'),
                 $new_start_date . '--' . $new_end_date
             );
 
@@ -124,24 +126,24 @@ if ($submission_failed != '1' && $total_rows > 0) {
 
         if ($daterange == '') {
 
-            $row_contents = array('Date Range:', 'ALL');
+            $row_contents = array(_('Date Range') . ':', strtoupper(_('All')));
 
         } else {
 
-            $row_contents = array('Date Range:', $daterange);
+            $row_contents = array(_('Date Range') . ':', $daterange);
 
         }
         $export->writeRow($export_file, $row_contents);
 
         $row_contents = array(
-            'Total Cost:',
+            _('Total Cost') . ':',
             $grand_total,
             $_SESSION['s_default_currency']
         );
         $export->writeRow($export_file, $row_contents);
 
         $row_contents = array(
-            'Number of SSL Certs:',
+            _('Number of SSL Certs') . ':',
             $number_of_certs_total
         );
         $export->writeRow($export_file, $row_contents);
@@ -149,10 +151,10 @@ if ($submission_failed != '1' && $total_rows > 0) {
         $export->writeBlankRow($export_file);
 
         $row_contents = array(
-            'Owner',
-            'Cost',
-            'SSL Certs',
-            'Per Cert'
+            _('Owner'),
+            _('Cost'),
+            _('SSL Certs'),
+            _('Per Cert')
         );
         $export->writeRow($export_file, $row_contents);
 
@@ -196,7 +198,7 @@ if ($submission_failed != '1' && $total_rows > 0) {
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
     <?php require_once DIR_INC . '/layout/date-range-picker-head.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php require_once DIR_INC . '/layout/reporting-block.inc.php'; ?>
 <?php
@@ -208,10 +210,10 @@ if ($submission_failed != '1' && $total_rows > 0) { ?>
         <thead>
         <tr>
             <th width="20px"></th>
-            <th>Owner</th>
-            <th>Cost</th>
-            <th>SSL Certs</th>
-            <th>Per Cert</th>
+            <th><?php echo _('Owner'); ?></th>
+            <th><?php echo _('Cost'); ?></th>
+            <th><?php echo _('SSL Certs'); ?></th>
+            <th><?php echo _('Per Cert'); ?></th>
         </tr>
         </thead>
         <tbody><?php
@@ -239,7 +241,7 @@ if ($submission_failed != '1' && $total_rows > 0) { ?>
 
 } else {
 
-    echo 'No results.<BR><BR>';
+    echo _('No results.') . '<BR>';
 
 }
 ?>

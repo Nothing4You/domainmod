@@ -3,7 +3,7 @@
  * /_includes/settings/system-notice.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -20,7 +20,7 @@
  */
 ?>
 <?php
-$page_title = "Notice";
-$breadcrumb = "Notice";
+$page_title = _('Notice');
+$breadcrumb = $page_title;
 $software_section = "system";
 $slug = "system-notice";

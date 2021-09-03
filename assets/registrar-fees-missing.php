@@ -3,7 +3,7 @@
  * /assets/registrar-fees-missing.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -44,7 +44,7 @@ $pdo = $deeb->cnxx;
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 $result = $pdo->query("
@@ -55,15 +55,13 @@ $result = $pdo->query("
     GROUP BY r.name
     ORDER BY r.name ASC")->fetchAll();
 ?>
-The following Registrars/TLDs are missing Domain fees. In order to ensure your domain reporting is accurate please
-update these fees as soon as possible.<BR>
-
+<?php echo _('The following Registrars/TLDs are missing Domain fees. In order to ensure your domain reporting is accurate please update these fees as soon as possible.'); ?><BR>
 <table id="<?php echo $slug; ?>" class="<?php echo $datatable_class; ?>">
     <thead>
     <tr>
         <th width="20px"></th>
-        <th>Registrar</th>
-        <th>Missing TLD Fees</th>
+        <th><?php echo _('Registrar'); ?></th>
+        <th><?php echo _('Missing TLD Fees'); ?></th>
     </tr>
     </thead>
     <tbody><?php

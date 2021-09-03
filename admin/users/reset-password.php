@@ -3,7 +3,7 @@
  * /admin/users/reset-password.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -28,6 +28,7 @@ require_once DIR_ROOT . '/vendor/autoload.php';
 
 $deeb = DomainMOD\Database::getInstance();
 $system = new DomainMOD\System();
+$user = new DomainMOD\User();
 $time = new DomainMOD\Time();
 
 require_once DIR_INC . '/head.inc.php';
@@ -67,23 +68,24 @@ if ($new_username != '') {
 
     if (!$result || $user_count > 1) {
 
-        $_SESSION['s_message_danger'] .= 'The password could not be reset due to an invalid username.<BR>';
+        $_SESSION['s_message_danger'] .= _('The password could not be reset due to an invalid username.') . '<BR>';
 
         header("Location: index.php");
         exit;
 
     } else {
 
-        $new_password = substr(md5(time()), 0, 8);
+        $new_password = $user->generatePassword(30);
+        $new_hash = $user->generateHash($new_password);
 
         $stmt = $pdo->prepare("
             UPDATE users
-            SET password = password(:new_password),
+            SET password = :new_hash,
                 new_password = '1',
                 update_time = :timestamp
             WHERE username = :username
               AND email_address = :email_address");
-        $stmt->bindValue('new_password', $new_password, PDO::PARAM_STR);
+        $stmt->bindValue('new_hash', $new_hash, PDO::PARAM_STR);
         $timestamp = $time->stamp();
         $stmt->bindValue('timestamp', $timestamp, PDO::PARAM_STR);
         $stmt->bindValue('username', $result->username, PDO::PARAM_STR);
@@ -92,15 +94,16 @@ if ($new_username != '') {
 
         if ($display == '1') {
 
-            $_SESSION['s_message_success'] .= 'The new password for ' . $result->username . ' is ' . $new_password . '<BR>';
+            $_SESSION['s_message_success'] .= sprintf(_('The new password for %s is %s'), $result->username, $new_password) . '<BR>';
 
         } else {
 
-            $email_address = $result->email_address;
             $first_name = $result->first_name;
             $last_name = $result->last_name;
+            $username = $result->username;
+            $email_address = $result->email_address;
             require_once DIR_INC . '/email/send-new-password.inc.php';
-            $_SESSION['s_message_success'] .= 'The password has been reset and emailed to the account holder<BR>';
+            $_SESSION['s_message_success'] .= _('The password has been reset and emailed to the account holder') . '<BR>';
 
         }
 
@@ -113,7 +116,7 @@ if ($new_username != '') {
 
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
-        if ($new_username == '') $_SESSION['s_message_danger'] .= 'Enter the username<BR>';
+        if ($new_username == '') $_SESSION['s_message_danger'] .= _('Enter the username') . '<BR>';
 
         header("Location: index.php");
         exit;

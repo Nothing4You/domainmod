@@ -3,7 +3,7 @@
  * /classes/DomainMOD/Validate.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -27,6 +27,29 @@ class Validate
    public function tld($tld)
     {
         if(preg_match('/^[a-z\.\-]+$/i', $tld)) {
+
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+
+   public function text($text)
+    {
+        /*
+         * Strip whitespace from beginning and end of value
+         * Make sure there's a value
+         * Make sure the value isn't all whitespace
+         * Make sure the value is 2 or more characters
+         */
+
+        $clean_text = trim($text);
+
+        if($clean_text != '' && !ctype_space($clean_text) && strlen($clean_text) >= 2) {
 
             return true;
 

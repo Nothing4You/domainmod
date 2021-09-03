@@ -3,7 +3,7 @@
  * /invalid.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -39,13 +39,13 @@ require_once DIR_INC . '/debug.inc.php';
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php
 $page_align = 'center';
 require_once DIR_INC . '/layout/header-bare.inc.php'; ?>
-The page you're trying to access is invalid.<BR>
+<?php echo _("The page you're trying to access is invalid."); ?><BR>
 <BR>
-<a href="<?php echo $web_root; ?>/">Go home</a>
+<a href="<?php echo $web_root; ?>/"><?php echo _('Go home'); ?></a>
 <?php require_once DIR_INC . '/layout/footer-bare.inc.php'; ?>
 </body>
 </html>

@@ -3,7 +3,7 @@
  * /reporting/ssl/cost-by-month.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -34,6 +34,8 @@ $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
 $reporting = new DomainMOD\Reporting();
 $currency = new DomainMOD\Currency();
+$sanitize = new DomainMOD\Sanitize();
+$unsanitize = new DomainMOD\Unsanitize();
 
 require_once DIR_INC . '/head.inc.php';
 require_once DIR_INC . '/debug.inc.php';
@@ -43,7 +45,7 @@ $system->authCheck();
 $pdo = $deeb->cnxx;
 
 $export_data = (int) $_GET['export_data'];
-$daterange = $_REQUEST['daterange'];
+$daterange = $sanitize->text($_REQUEST['daterange']);
 
 list($new_start_date, $new_end_date) = $date->splitAndCheckRange($daterange);
 
@@ -53,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($new_start_date > $new_end_date) {
 
-        $_SESSION['s_message_danger'] .= 'The ending date proceeds the starting date<BR>';
+        $_SESSION['s_message_danger'] .= _('The ending date proceeds the starting date') . '<BR>';
         $submission_failed = '1';
 
     }
@@ -102,12 +104,12 @@ if ($submission_failed != '1' && $total_rows > 0) {
 
         if ($daterange == '') {
 
-            $export_file = $export->openFile('ssl_cost_by_month_report_all', strtotime($time->stamp()));
+            $export_file = $export->openFile(_('ssl_cost_by_month_report_all'), strtotime($time->stamp()));
 
         } else {
 
             $export_file = $export->openFile(
-                'ssl_cost_by_month_report',
+                _('ssl_cost_by_month_report'),
                 $new_start_date . '--' . $new_end_date
             );
 
@@ -120,24 +122,24 @@ if ($submission_failed != '1' && $total_rows > 0) {
 
         if ($daterange == '') {
 
-            $row_contents = array('Date Range:', 'ALL');
+            $row_contents = array(_('Date Range') . ':', strtoupper(_('All')));
 
         } else {
 
-            $row_contents = array('Date Range:', $daterange);
+            $row_contents = array(_('Date Range') . ':', $daterange);
 
         }
         $export->writeRow($export_file, $row_contents);
 
         $row_contents = array(
-            'Total Cost:',
+            _('Total Cost') . ':',
             $grand_total,
             $_SESSION['s_default_currency']
         );
         $export->writeRow($export_file, $row_contents);
 
         $row_contents = array(
-            'Number of SSL Certs:',
+            _('Number of SSL Certs') . ':',
             $number_of_certs_total
         );
         $export->writeRow($export_file, $row_contents);
@@ -145,10 +147,10 @@ if ($submission_failed != '1' && $total_rows > 0) {
         $export->writeBlankRow($export_file);
 
         $row_contents = array(
-            'Year',
-            'Month',
-            'Cost',
-            'By Year'
+            _('Year'),
+            _('Month'),
+            _('Cost'),
+            _('By Year')
         );
         $export->writeRow($export_file, $row_contents);
 
@@ -185,18 +187,18 @@ if ($submission_failed != '1' && $total_rows > 0) {
                 $monthly_cost = $currency->format($monthly_cost, $_SESSION['s_default_currency_symbol'],
                     $_SESSION['s_default_currency_symbol_order'], $_SESSION['s_default_currency_symbol_space']);
 
-                if ($row->month == '1') { $display_month = 'January';
-                } elseif ($row->month == '2') { $display_month = 'February';
-                } elseif ($row->month == '3') { $display_month = 'March';
-                } elseif ($row->month == '4') { $display_month = 'April';
-                } elseif ($row->month == '5') { $display_month = 'May';
-                } elseif ($row->month == '6') { $display_month = 'June';
-                } elseif ($row->month == '7') { $display_month = 'July';
-                } elseif ($row->month == '8') { $display_month = 'August';
-                } elseif ($row->month == '9') { $display_month = 'September';
-                } elseif ($row->month == '10') { $display_month = 'October';
-                } elseif ($row->month == '11') { $display_month = 'November';
-                } elseif ($row->month == '12') { $display_month = 'December';
+                if ($row->month == '1') { $display_month = _('January');
+                } elseif ($row->month == '2') { $display_month = _('February');
+                } elseif ($row->month == '3') { $display_month = _('March');
+                } elseif ($row->month == '4') { $display_month = _('April');
+                } elseif ($row->month == '5') { $display_month = _('May');
+                } elseif ($row->month == '6') { $display_month = _('June');
+                } elseif ($row->month == '7') { $display_month = _('July');
+                } elseif ($row->month == '8') { $display_month = _('August');
+                } elseif ($row->month == '9') { $display_month = _('September');
+                } elseif ($row->month == '10') { $display_month = _('October');
+                } elseif ($row->month == '11') { $display_month = _('November');
+                } elseif ($row->month == '12') { $display_month = _('December');
                 }
 
                 $result_yearly_cost = $pdo->query("
@@ -250,7 +252,7 @@ if ($submission_failed != '1' && $total_rows > 0) {
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
     <?php require_once DIR_INC . '/layout/date-range-picker-head.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php require_once DIR_INC . '/layout/reporting-block.inc.php'; ?>
 <?php
@@ -262,10 +264,10 @@ if ($submission_failed != '1' && $total_rows > 0) { ?>
         <thead>
         <tr>
             <th width="20px"></th>
-            <th>Year</th>
-            <th>Month</th>
-            <th>Cost</th>
-            <th>By Year</th>
+            <th><?php echo _('Year'); ?></th>
+            <th><?php echo _('Month'); ?></th>
+            <th><?php echo _('Cost'); ?></th>
+            <th><?php echo _('By Year'); ?></th>
         </tr>
         </thead>
         <tbody><?php
@@ -368,7 +370,7 @@ if ($submission_failed != '1' && $total_rows > 0) { ?>
 
 } else {
 
-    echo 'No results.<BR><BR>';
+    echo _('No results.') . '<BR>';
 
 }
 ?>

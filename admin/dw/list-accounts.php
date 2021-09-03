@@ -3,7 +3,7 @@
  * /admin/dw/list-accounts.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -81,7 +81,7 @@ if ($domain != "") { //@formatter:off
 if ($export_data === 1) {
 
     $export = new DomainMOD\Export();
-    $export_file = $export->openFile('dw_account_list', strtotime($time->stamp()));
+    $export_file = $export->openFile(_('dw_account_list'), strtotime($time->stamp()));
 
     $row_contents = array($page_title);
     $export->writeRow($export_file, $row_contents);
@@ -89,7 +89,7 @@ if ($export_data === 1) {
     $export->writeBlankRow($export_file);
 
     $row_contents = array(
-        'Number of Accounts:', number_format(count($result))
+        _('Number of Accounts') . ':', number_format(count($result))
     );
     $export->writeRow($export_file, $row_contents);
 
@@ -98,7 +98,7 @@ if ($export_data === 1) {
     if ($domain != "") {
 
         $row_contents = array(
-            'Domain Filter:',
+            _('Domain Filter') . ':',
             $domain
         );
         $export->writeRow($export_file, $row_contents);
@@ -108,35 +108,35 @@ if ($export_data === 1) {
     }
 
     $row_contents = array(
-        'Server Name',
-        'Server Host',
-        'Domain',
-        'IP Address',
-        'Owner',
-        'User',
-        'Email',
-        'Plan',
-        'Theme',
-        'Shell',
-        'Partition',
-        'Disk Limit (MB)',
-        'Disk Used (MB)',
-        'Max Addons',
-        'Max FTP',
-        'Max Email Lists',
-        'Max Parked Domains',
-        'Max POP Accounts',
-        'Max SQL Databases',
-        'Max Subdomains',
-        'Start Date',
-        'Start Date (Unix)',
-        'Suspended?',
-        'Suspend Reason',
-        'Suspend Time (Unix)',
-        'Max Emails Per Hour',
-        'Max Email Failure % (For Rate Limiting)',
-        'Min Email Failure # (For Rate Limiting)',
-        'Inserted (into DW)'
+        _('Server Name'),
+        _('Server Host'),
+        _('Domain'),
+        _('IP Address'),
+        _('Owner'),
+        _('User'),
+        _('Email'),
+        _('Plan'),
+        _('Theme'),
+        _('Shell'),
+        _('Partition'),
+        _('Disk Limit (MB)'),
+        _('Disk Used (MB)'),
+        _('Max Addons'),
+        _('Max FTP'),
+        _('Max Email Lists'),
+        _('Max Parked Domains'),
+        _('Max POP Accounts'),
+        _('Max SQL Databases'),
+        _('Max Subdomains'),
+        _('Start Date'),
+        _('Start Date (Unix)'),
+        _('Suspended') . '?',
+        _('Suspend Reason'),
+        _('Suspend Time (Unix)'),
+        _('Max Emails Per Hour'),
+        _('Max Email Failure % (For Rate Limiting)'),
+        _('Min Email Failure # (For Rate Limiting)'),
+        _('Inserted (into DW)')
     );
     $export->writeRow($export_file, $row_contents);
 
@@ -191,16 +191,16 @@ if ($export_data === 1) {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php';
 
 if (!$result) {
 
-    echo "Your search returned 0 results.";
+    echo _('Your search returned 0 results.');
 
 } else { ?>
 
-    <a href="list-accounts.php?export_data=1"><?php echo $layout->showButton('button', 'Export'); ?></a><BR><BR><?php
+    <a href="list-accounts.php?export_data=1"><?php echo $layout->showButton('button', _('Export')); ?></a><BR><BR><?php
 
     $dwdisplay = new DomainMOD\DwDisplay(); ?>
 
@@ -208,8 +208,8 @@ if (!$result) {
         <thead>
         <tr>
             <th width="20px"></th>
-            <th>Account</th>
-            <th>Data</th>
+            <th><?php echo _('Account'); ?></th>
+            <th><?php echo _('Data'); ?></th>
             <th></th>
             <th></th>
             <th></th>

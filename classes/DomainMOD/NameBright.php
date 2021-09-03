@@ -3,7 +3,7 @@
  * /classes/DomainMOD/NameBright.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -48,7 +48,7 @@ class NameBright
             $full_url = $base_url . "rest/account/domains/" . $domain . "/nameservers";
             $post_fields = '';
         } else {
-            return array('Unable to build API URL', '');
+            return array(_('Unable to build API URL'), '');
         }
 
         return array($full_url, $post_fields);

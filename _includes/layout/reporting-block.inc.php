@@ -3,7 +3,7 @@
  * /_includes/layout/reporting-block.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -18,21 +18,20 @@
  * http://www.gnu.org/licenses/.
  *
  */
-?>
-<?php echo $form->showFormTop(''); ?>
+//@formatter:off ?>
 
-<a href="<?php echo $report_filename; ?>"><?php echo $layout->showButton('button', 'View Full Report'); ?></a><BR><BR><strong>or Expiring Between</strong><BR>
+    <a href="<?php echo $report_filename; ?>"><?php echo $layout->showButton('button', _('View Full Report')); ?></a>&nbsp;&nbsp;<?php
 
-<input type="text" name="daterange" size="26" value="<?php echo $daterange; ?>" />
+    if ($total_rows > 0 && $total_rows != '') { ?>
+        <a href="<?php echo $report_filename; ?>?export_data=1&daterange=<?php echo $daterange; ?>"><?php echo $layout->showButton('button', _('Export Report')); ?></a><?php
+    } ?>
+    <BR><BR><strong><?php echo _('Filter By Date Range'); ?></strong><BR>
 
-&nbsp;&nbsp;<?php echo $form->showSubmitButton('Generate Report', '', ''); ?><BR>
+    <?php echo $form->showFormTop(''); ?>
 
-<?php
-if ($total_rows > 0 && $total_rows != '') { //@formatter:off ?>
+    <input type="text" name="daterange" size="16" value="<?php echo $daterange; ?>" />
 
-    <BR><a href="<?php echo $report_filename; ?>?export_data=1&daterange=<?php echo $daterange; ?>"><?php
-        echo $layout->showButton('button', 'Export'); ?></a>
+    <?php echo $form->showSubmitButton(_('Filter Report'), '&nbsp;&nbsp;', '<BR><BR>'); ?>
 
-<?php } //@formatter:on ?>
-<?php
+<?php //@formatter:on
 echo $form->showFormBottom('');

@@ -3,7 +3,7 @@
  * /_includes/breadcrumbs/admin-custom-ssl-fields.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -19,5 +19,6 @@
  *
  */
 ?>
-<li><a href="<?php echo $web_root; ?>/admin/">Admin</a></li>
-<li class="active"><?php echo $breadcrumb; ?></li>
+    <li class="breadcrumb-item"><a href="<?php echo $web_root; ?>/admin/"><?php echo _('Admin'); ?></a></li>
+    <li class="breadcrumb-item active"><?php echo $breadcrumb; ?></li>
+</ol>

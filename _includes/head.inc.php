@@ -3,7 +3,7 @@
  * /_includes/head.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -21,3 +21,45 @@
 ?>
 <?php
 header('Content-Type: text/html; charset=utf-8');
+
+if ($disable_csp === 0) {
+
+    define('CURRENT_NONCE', md5(uniqid(rand(), true)));
+
+    $browser_detect = new \DomainMOD\Detect();
+    $browser_name = $browser_detect->getBrowser();
+
+    // SECONDARY CSP HEADER -- For browsers that don't support script-src-elem and style-src-elem yet
+    // This is created by copying the Primary CSP header and moving the data from the -elem fields into their base fields
+    // script-src-elem = script-src / stype-src-elem = style-src
+    if ($browser_name === 'firefox' || $browser_name === 'safari' || $browser_name === 'seamonkey') {
+
+        $csp_header = "Content-Security-Policy: default-src 'none'; font-src 'self' code.ionicframework.com fonts.gstatic.com; img-src 'self' data:; script-src 'self' 'nonce-" . CURRENT_NONCE . "'; style-src 'self' code.ionicframework.com fonts.googleapis.com; base-uri 'none'; form-action 'self'; frame-ancestors 'none';";
+
+    // PRIMARY CSP HEADER
+    // chrome, chromium, opera, all other browers minus firefox, safari, and seamonkey
+    } else {
+
+        $csp_header = "Content-Security-Policy: default-src 'none'; font-src 'self' code.ionicframework.com fonts.gstatic.com; img-src 'self' data:; script-src 'none'; script-src-elem 'self' 'nonce-" . CURRENT_NONCE . "'; style-src 'none'; style-src-elem 'self' code.ionicframework.com fonts.googleapis.com; base-uri 'none'; form-action 'self'; frame-ancestors 'none';";
+
+    }
+
+    if ($force_https === 1) {
+
+        $csp_header .= ' upgrade-insecure-requests;';
+
+    }
+
+    header($csp_header);
+
+}
+
+if ($force_https === 1) {
+
+    header("Strict-Transport-Security: max-age=31536000");
+
+}
+
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header("X-XSS-Protection: 1; mode=block");

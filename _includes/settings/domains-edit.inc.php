@@ -3,7 +3,7 @@
  * /_includes/settings/domains-edit.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -20,17 +20,11 @@
  */
 ?>
 <?php
-$page_title = "Edit Domain";
-$breadcrumb = "Edit";
+$page_title = _('Edit Domain');
+$breadcrumb = _('Edit');
 $software_section = "domains";
 $software_section_logo = "fa-sitemap";
 $slug = "domains-edit";
-$datatable_css = '#' . $slug . '-account thead th { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }
-                  #' . $slug . '-account tbody tr:hover { background-color: #ffffff; }
-                  #' . $slug . '-account tbody td { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }
-                  #' . $slug . '-zone thead th { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }
-                  #' . $slug . '-zone tbody tr:hover { background-color: #ffffff; }
-                  #' . $slug . '-zone tbody td { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }';
 $datatable_class = 'table table-striped dt-responsive cell-border compact';
 $datatable_options = 'var oldStart = 0;
                       $(\'#' . $slug . '-account\').DataTable({

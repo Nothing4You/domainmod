@@ -3,7 +3,7 @@
  * /assets/add/registrar-account.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -33,6 +33,7 @@ $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
 $sanitize = new DomainMOD\Sanitize();
 $unsanitize = new DomainMOD\Unsanitize();
+$validate = new DomainMOD\Validate();
 
 require_once DIR_INC . '/head.inc.php';
 require_once DIR_INC . '/debug.inc.php';
@@ -57,7 +58,7 @@ $new_notes = $sanitize->text($_POST['new_notes']);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    if ($new_username != "" && $new_owner_id !== 0 && $new_registrar_id !== 0) {
+    if ($validate->text($new_username) && $new_owner_id !== 0 && $new_registrar_id !== 0) {
 
         $stmt = $pdo->prepare("
             INSERT INTO registrar_accounts
@@ -85,8 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute();
 
         $assets = new DomainMOD\Assets();
-        $_SESSION['s_message_success'] .= "Registrar Account " . $new_username . " (" .
-            $assets->getRegistrar($new_registrar_id) . ", " . $assets->getOwner($new_owner_id) . ") Added<BR>";
+        $_SESSION['s_message_success'] .= sprintf(_('Registrar Account %s (%s, %s) added'),
+                $new_username, $assets->getRegistrar($new_registrar_id), $assets->getOwner($new_owner_id)) . '<BR>';
 
         if ($_SESSION['s_has_registrar_account'] != '1') {
 
@@ -105,17 +106,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($new_owner_id === 0) {
 
-            $_SESSION['s_message_danger'] .= "Choose the owner<BR>";
+            $_SESSION['s_message_danger'] .= _('Choose the owner') . '<BR>';
 
         }
 
         if ($new_registrar_id === 0) {
 
-            $_SESSION['s_message_danger'] .= "Choose the registrar<BR>";
+            $_SESSION['s_message_danger'] .= _('Choose the registrar') . '<BR>';
 
         }
 
-        if ($new_username == "") { $_SESSION['s_message_danger'] .= "Enter a username<BR>"; }
+        if (!$validate->text($new_username)) { $_SESSION['s_message_danger'] .= _('Enter a username') . '<BR>'; }
 
     }
 
@@ -127,12 +128,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 echo $form->showFormTop('');
 
-echo $form->showDropdownTop('new_registrar_id', 'Registrar', '', '1', '');
+echo $form->showDropdownTop('new_registrar_id', _('Registrar'), '', '1', '');
 if ($new_registrar_id === 0) {
     $to_compare = $_SESSION['s_default_registrar'];
 } else {
@@ -147,7 +148,7 @@ foreach ($result as $row) {
 }
 echo $form->showDropdownBottom('');
 
-echo $form->showDropdownTop('new_owner_id', 'Account Owner', '', '1', '');
+echo $form->showDropdownTop('new_owner_id', _('Account Owner'), '', '1', '');
 if ($new_owner_id === 0) {
     $to_compare = $_SESSION['s_default_owner_domains'];
 } else {
@@ -162,46 +163,38 @@ foreach ($result as $row) {
 }
 echo $form->showDropdownBottom('');
 
-echo $form->showInputText('new_email_address', 'Email Address (100)', '', $unsanitize->text($new_email_address), '100', '', '', '', '');
-echo $form->showInputText('new_username', 'Username (100)', '', $unsanitize->text($new_username), '100', '', '1', '', '');
-echo $form->showInputText('new_password', 'Password (255)', '', $unsanitize->text($new_password), '255', '', '', '', '');
+echo $form->showInputText('new_email_address', _('Email Address') . ' (100)', '', $unsanitize->text($new_email_address), '100', '', '', '', '');
+echo $form->showInputText('new_username', _('Username') . ' (100)', '', $unsanitize->text($new_username), '100', '', '1', '', '');
+echo $form->showInputText('new_password', _('Password') . ' (255)', '', $unsanitize->text($new_password), '255', '', '', '', '');
 
-echo $form->showRadioTop('Reseller Account?', '', '');
-echo $form->showRadioOption('new_reseller', '1', 'Yes', $new_reseller, '<BR>', '&nbsp;&nbsp;&nbsp;&nbsp;');
-echo $form->showRadioOption('new_reseller', '0', 'No', $new_reseller, '', '');
+echo $form->showRadioTop(_('Reseller Account') . '?', '', '');
+echo $form->showRadioOption('new_reseller', '1', _('Yes'), $new_reseller, '<BR>', '&nbsp;&nbsp;&nbsp;&nbsp;');
+echo $form->showRadioOption('new_reseller', '0', _('No'), $new_reseller, '', '');
 echo $form->showRadioBottom('');
 
-echo $form->showInputText('new_reseller_id', 'Reseller ID (100)', '', $new_reseller_id, '100', '', '', '', '');
-?>
+echo $form->showInputText('new_reseller_id', _('Reseller ID') . ' (100)', '', $new_reseller_id, '100', '', '', '', '');
 
-<div class="box box-default collapsed-box box-solid">
-    <div class="box-header with-border">
-        <h3 class="box-title" style="padding-top: 3px;">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>&nbsp;API Credentials
-        </h3>
-    </div>
-    <div class="box-body"><?php
+echo $layout->expandableBoxTop(_('API Credentials'), '', '');
 
-        echo $form->showInputText('new_api_app_name', 'API App Name', '', $unsanitize->text($new_api_app_name), '255', '', '', '', '');
-        echo $form->showInputText('new_api_key', 'API Key', '', $unsanitize->text($new_api_key), '255', '', '', '', '');
-        echo $form->showInputText('new_api_secret', 'API Secret', '', $unsanitize->text($new_api_secret), '255', '', '', '', '');
+echo $form->showInputText('new_api_app_name', _('API App Name'), '', $unsanitize->text($new_api_app_name), '255', '', '', '', '');
+echo $form->showInputText('new_api_key', _('API Key'), '', $unsanitize->text($new_api_key), '255', '', '', '', '');
+echo $form->showInputText('new_api_secret', _('API Secret'), '', $unsanitize->text($new_api_secret), '255', '', '', '', '');
 
-        echo $form->showDropdownTop('new_api_ip_id', 'API IP Address', 'The IP Address that you whitelisted with the domain registrar for API access.', '', '');
-        echo $form->showDropdownOption('0', 'n/a', '0');
-        $result = $pdo->query("
-            SELECT id, `name`, ip
-            FROM ip_addresses
-            ORDER BY `name` ASC")->fetchAll();
-        foreach ($result as $row) {
-            echo $form->showDropdownOption($row->id, $row->name . ' (' . $row->ip . ')', $new_api_ip_id);
-        }
-        echo $form->showDropdownBottom(''); ?>
+echo $form->showDropdownTop('new_api_ip_id', _('API IP Address'), _('The IP Address that you whitelisted with the domain registrar for API access.'), '', '');
+echo $form->showDropdownOption('0', 'n/a', '0');
+$result = $pdo->query("
+    SELECT id, `name`, ip
+    FROM ip_addresses
+    ORDER BY `name` ASC")->fetchAll();
+foreach ($result as $row) {
+    echo $form->showDropdownOption($row->id, $row->name . ' (' . $row->ip . ')', $new_api_ip_id);
+}
+echo $form->showDropdownBottom('');
 
-    </div>
-</div><BR><?php
+echo $layout->expandableBoxBottom();
 
-echo $form->showInputTextarea('new_notes', 'Notes', '', $unsanitize->text($new_notes), '', '', '');
-echo $form->showSubmitButton('Add Registrar Account', '', '');
+echo $form->showInputTextarea('new_notes', _('Notes'), '', $unsanitize->text($new_notes), '', '', '');
+echo $form->showSubmitButton(_('Add Registrar Account'), '', '');
 echo $form->showFormBottom('');
 ?>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>

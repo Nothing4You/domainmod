@@ -3,7 +3,7 @@
  * /index.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -32,6 +32,7 @@ $log = new DomainMOD\Log('/index.php');
 $maint = new DomainMOD\Maintenance();
 $layout = new DomainMOD\Layout();
 $login = new DomainMOD\Login();
+$user = new DomainMOD\User();
 $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
 $format = new DomainMOD\Format();
@@ -60,8 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_username != "" && $new_password
 
     $_SESSION['s_read_only'] = '1';
 
+    // Check to see if the user's password is using the old md5 hashing
     $stmt = $pdo->prepare("
-        SELECT id, username
+        SELECT id
         FROM users
         WHERE username = :new_username
           AND `password` = password(:new_password)
@@ -72,18 +74,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_username != "" && $new_password
     $result = $stmt->fetch();
     $stmt->closeCursor();
 
-    if (!$result) {
+    // Update the stored password to use stronger hashing than md5
+    if ($result) {
 
-        $log_message = 'Unable to login';
-        $log_extra = array('Username' => $new_username, 'Password' => $format->obfusc($new_password));
-        $log->warning($log_message, $log_extra);
+        $new_hashed_password = $user->generateHash($new_password);
 
-        $_SESSION['s_message_danger'] .= "Login Failed<BR>";
+        $stmt = $pdo->prepare("
+            UPDATE `users`
+            SET password = :new_hashed_password
+            WHERE username = :new_username
+              AND `password` = password(:new_password)
+              AND active = '1'");
+        $stmt->bindValue('new_hashed_password', $new_hashed_password, PDO::PARAM_STR);
+        $stmt->bindValue('new_username', $new_username, PDO::PARAM_STR);
+        $stmt->bindValue('new_password', $new_password, PDO::PARAM_STR);
+        $stmt->execute();
 
-    } else {
+    }
 
-        $_SESSION['s_user_id'] = $result->id;
-        $_SESSION['s_username'] = $result->username;
+    // Check to see if the user's password matches
+    $stmt = $pdo->prepare("
+        SELECT `password`
+        FROM users
+        WHERE username = :new_username
+          AND active = '1'");
+    $stmt->bindValue('new_username', $new_username, PDO::PARAM_STR);
+    $stmt->execute();
+    $stored_hash = $stmt->fetchColumn();
+
+    if (password_verify($new_password, $stored_hash)) {
+
+        $_SESSION['s_user_id'] = $user->getUserId($new_username);
+        $_SESSION['s_username'] = $new_username;
+        $_SESSION['s_stored_hash'] = $stored_hash;
 
         $_SESSION['s_system_db_version'] = $system->getDbVersion();
 
@@ -91,6 +114,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_username != "" && $new_password
 
         header("Location: checks.php");
         exit;
+
+    } else {
+
+        $log_message = 'Unable to login';
+        $log_extra = array('Username' => $new_username, 'Password' => $format->obfusc($new_password));
+        $log->warning($log_message, $log_extra);
+
+        $_SESSION['s_message_danger'] .= _('Login Failed') . '<BR>';
 
     }
 
@@ -100,12 +131,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $new_username != "" && $new_password
 
         if ($new_username == "" && $new_password == "") {
 
-            $_SESSION['s_message_danger'] .= "Enter your username & password<BR>";
+            $_SESSION['s_message_danger'] .= _('Enter your username & password') . '<BR>';
 
         } elseif ($new_username == "" || $new_password == "") {
 
-            if ($new_username == "") $_SESSION['s_message_danger'] .= "Enter your username<BR>";
-            if ($new_password == "") $_SESSION['s_message_danger'] .= "Enter your password<BR>";
+            if ($new_username == "") $_SESSION['s_message_danger'] .= _('Enter your username') . '<BR>';
+            if ($new_password == "") $_SESSION['s_message_danger'] .= _('Enter your password') . '<BR>';
 
         }
 
@@ -125,36 +156,62 @@ $new_password = "";
     } ?>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<?php
-if ($new_username == "") { ?>
-
-    <body class="hold-transition skin-red" onLoad="document.forms[0].elements[0].focus()"><?php
-
-} else { ?>
-
-    <body class="hold-transition skin-red" onLoad="document.forms[0].elements[1].focus()"><?php
-
-} ?>
+<body class="hold-transition login-page text-sm">
 <?php require_once DIR_INC . '/layout/header-login.inc.php'; ?>
-<?php
-echo $form->showFormTop('');
 
-if (DEMO_INSTALLATION === true) { ?>
-    <strong>Demo Username:</strong> demo<BR>
-    <strong>Demo Password:</strong> demo<BR><BR><?php
-}
+<div class="card card-outline card-danger">
+    <div class="card-body login-card-body">
+        <p class="login-box-msg"><?php echo _('Please enter your username and password to sign in'); ?></p><?php
 
-echo $form->showInputText('new_username', 'Username', '', $new_username, '20', '', '', '', '');
-echo $form->showInputText('new_password', 'Password', '', '', '255', '1', '', '', '');
-echo $form->showSubmitButton('Login', '', '');
-echo $form->showFormBottom('');
+        if (DEMO_INSTALLATION == true) { ?>
 
-if (DEMO_INSTALLATION === false) { ?>
+            <strong><?php echo _('Demo Username'); ?>:</strong> demo<BR>
+            <strong><?php echo _('Demo Password'); ?>:</strong> demo<BR><BR><?php
 
-    <BR><a href="reset.php">Forgot your Password?</a><?php
+        } ?>
+
+        <form action="" method="post">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Username" name="new_username" maxlength="20">
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-user"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <input type="password" class="form-control" placeholder="Password" name="new_password" maxlength="72">
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-lock"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    &nbsp;
+                </div>
+                <!-- /.col -->
+                <div class="col-4">
+                    <button type="submit" class="btn btn-danger btn-block">Sign In</button>
+                </div>
+                <!-- /.col -->
+            </div>
+        </form>
+    </div>
+    <!-- /.login-card-body -->
+</div><?php
+
+if (DEMO_INSTALLATION == false) { ?>
+
+    <BR>
+    <p class="mb-1">
+        <a href="reset.php"><?php echo _('Forgot your Password'); ?>?</a>
+    </p><?php
 
 }
 ?>
+
 <?php require_once DIR_INC . '/layout/footer-login.inc.php'; ?>
 </body>
 </html>

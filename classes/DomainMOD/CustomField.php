@@ -3,7 +3,7 @@
  * /classes/DomainMOD/CustomField.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -69,6 +69,30 @@ class CustomField
             SELECT field_name
             FROM " . $table_name . "
             ORDER BY `name` ASC")->fetchAll();
+    }
+
+    public function getTypeId($table_name, $field_id)
+    {
+        return $this->deeb->cnxx->query("
+            SELECT type_id
+            FROM " . $table_name . "
+            WHERE ID = " . $field_id)->fetchColumn();
+    }
+
+    public function getName($table_name, $field_id)
+    {
+        return $this->deeb->cnxx->query("
+            SELECT `name`
+            FROM " . $table_name . "
+            WHERE ID = " . $field_id)->fetchColumn();
+    }
+
+    public function getType($type_id)
+    {
+        return $this->deeb->cnxx->query("
+            SELECT `name`
+            FROM custom_field_types
+            WHERE ID = " . $type_id)->fetchColumn();
     }
 
     public function getCustomFieldsSql($table_name, $column_prefix)

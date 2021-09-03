@@ -3,7 +3,7 @@
  * /admin/dw/rebuild.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -45,16 +45,16 @@ $system->checkAdminUser($_SESSION['s_is_admin']);
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
-if (DEMO_INSTALLATION === false) {
+if (DEMO_INSTALLATION == false) {
 
     $result_message = $dw->build();
 
 } else {
 
-    $result_message = "Data Warehouse Rebuilt.";
+    $result_message = _('Data Warehouse Rebuilt.');
 
 }
 
@@ -62,13 +62,13 @@ if ($result_message !== false) {
 
     echo $result_message;
     echo '<BR><BR>';
-    echo '<a href="dw.php">' . $layout->showButton('button', 'Go To Data Warehouse') . '</a>';
+    echo '<a href="dw.php">' . $layout->showButton('button', _('Go To Data Warehouse')) . '</a>';
 
 } else {
 
-    echo 'There was a problem rebuilding the Data Warehouse.';
+    echo _('There was a problem rebuilding the Data Warehouse.');
     echo '<BR><BR>';
-    echo '<a href="rebuild.php">' . $layout->showButton('button', 'Try again') . '</a>';
+    echo '<a href="rebuild.php">' . $layout->showButton('button', _('Try again')) . '</a>';
 
 }
 ?>

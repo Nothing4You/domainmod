@@ -3,7 +3,7 @@
  * /reset.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -32,14 +32,16 @@ $maint = new DomainMOD\Maintenance();
 $layout = new DomainMOD\Layout();
 $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
+$user = new DomainMOD\User();
 
 require_once DIR_INC . '/head.inc.php';
+require_once DIR_INC . '/config-demo.inc.php';
 require_once DIR_INC . '/debug.inc.php';
 
 $system->loginCheck();
 $pdo = $deeb->cnxx;
 
-$page_title = "Reset Password";
+$page_title = _('Reset Password');
 $software_section = "resetpassword";
 
 $user_identifier = $_REQUEST['user_identifier'];
@@ -57,25 +59,26 @@ if ($user_identifier != '') {
     $result = $stmt->fetch();
     $stmt->closeCursor();
 
-    if (!$result) {
+    $_SESSION['s_message_success'] .= _("If there's a matching username or email address your new password will been emailed to you.") . '<BR>';
 
-        $_SESSION['s_message_success'] .= "If there is a matching username or email address in the system your new password will been emailed to you.<BR>";
+    if (!$result) {
 
         header('Location: ' . $web_root . "/");
         exit;
 
     } else {
 
-        $new_password = substr(md5(time()), 0, 8);
+        $new_password = $user->generatePassword(30);
+        $new_hash = $user->generateHash($new_password);
 
         $stmt = $pdo->prepare("
             UPDATE users
-            SET `password` = password(:new_password),
+            SET `password` = :new_hash,
                 new_password = '1',
                 update_time = :timestamp
             WHERE username = :username
               AND email_address = :email_address");
-        $stmt->bindValue('new_password', $new_password, PDO::PARAM_STR);
+        $stmt->bindValue('new_hash', $new_hash, PDO::PARAM_STR);
         $bind_timestamp = $time->stamp();
         $stmt->bindValue('timestamp', $bind_timestamp, PDO::PARAM_STR);
         $stmt->bindValue('username', $result->username, PDO::PARAM_STR);
@@ -88,8 +91,6 @@ if ($user_identifier != '') {
         $email_address = $result->email_address;
         require_once DIR_INC . '/email/send-new-password.inc.php';
 
-        $_SESSION['s_message_success'] .= "If there is a matching username or email address in the system your new password will been emailed to you.<BR>";
-
         header('Location: ' . $web_root . "/");
         exit;
 
@@ -100,7 +101,7 @@ if ($user_identifier != '') {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($user_identifier == "") {
-            $_SESSION['s_message_danger'] .= "Enter your username or email address<BR>";
+            $_SESSION['s_message_danger'] .= _('Enter your username or email address') . '<BR>';
         }
 
     }
@@ -113,15 +114,38 @@ if ($user_identifier != '') {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red" onLoad="document.forms[0].elements[0].focus()">
+<body class="hold-transition login-page text-sm">
 <?php require_once DIR_INC . '/layout/header-login.inc.php'; ?>
-<?php
-    echo $form->showFormTop('');
-    echo $form->showInputText('user_identifier', 'Username or Email Address', '', $user_identifier, '100', '', '', '', '');
-    echo $form->showSubmitButton('Reset Password', '', '');
-    echo $form->showFormBottom('');
-?>
-<BR><a href="<?php echo $web_root; ?>/">Cancel Password Reset</a>
+
+<div class="login-box">
+    <div class="card card-outline card-danger">
+        <div class="card-body">
+            <p class="login-box-msg"><?php echo _('Username or Email Address'); ?></p>
+
+            <form method="post">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Username or Email Address" maxlength="100" name="user_identifier">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-danger btn-block"><?php echo _('Reset Password'); ?></button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
+        </div>
+        <!-- /.login-card-body -->
+    </div>
+    <p class="mt-3 mb-1">
+        <a href="./"><?php echo _('Sign In'); ?></a>
+    </p>
+</div>
+<!-- /.login-box -->
 <?php require_once DIR_INC . '/layout/footer-login.inc.php'; ?>
 </body>
 </html>

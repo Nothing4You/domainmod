@@ -3,7 +3,7 @@
  * /classes/DomainMOD/Goal.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -62,7 +62,7 @@ class Goal
         $act_new_version = SOFTWARE_VERSION;
         $act_ip_address = $this->getIp();
         $act_agent = $_SERVER['HTTP_USER_AGENT'];
-        $act_language = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+        $act_language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : 'en';
 
         $stmt = $pdo->prepare("
             INSERT INTO goal_activity

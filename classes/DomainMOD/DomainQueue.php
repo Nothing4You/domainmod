@@ -3,7 +3,7 @@
  * /classes/DomainMOD/DomainQueue.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -106,6 +106,12 @@ class DomainQueue
                     list($account_username, $account_password) = $this->api->getUserPass($row->account_id);
                     list($domain_count, $domain_list) = $registrar->getDomainList($account_username, $account_password);
 
+                } elseif ($row->api_registrar_name == 'Gandi') {
+
+                    $registrar = new Gandi();
+                    $api_key = $this->api->getKey($row->account_id);
+                    list($domain_count, $domain_list) = $registrar->getDomainList($api_key);
+
                 } elseif ($row->api_registrar_name == 'GoDaddy') {
 
                     $registrar = new GoDaddy();
@@ -150,7 +156,7 @@ class DomainQueue
 
                 } else {
 
-                    return "Invalid Domain Registrar";
+                    return _('Invalid Domain Registrar');
 
                 }
 
@@ -183,7 +189,7 @@ class DomainQueue
 
         $this->copyToHistoryList();
 
-        return 'Domain List Queue Processed<BR>';
+        return _('Domain List Queue Processed') . '<BR>';
     }
 
     public function processQueueDomain()
@@ -246,6 +252,12 @@ class DomainQueue
                     list($account_username, $account_password) = $this->api->getUserPass($row->account_id);
                     list($expiration_date, $dns_servers, $privacy_status, $autorenew_status) = $registrar->getFullInfo($account_username, $account_password, $row->domain);
 
+                } elseif ($row->api_registrar_name == 'Gandi') {
+
+                    $registrar = new Gandi();
+                    $api_key = $this->api->getKey($row->account_id);
+                    list($expiration_date, $dns_servers, $privacy_status, $autorenew_status) = $registrar->getFullInfo($api_key, $row->domain);
+
                 } elseif ($row->api_registrar_name == 'GoDaddy') {
 
                     $registrar = new GoDaddy();
@@ -296,7 +308,7 @@ class DomainQueue
 
                 } else {
 
-                    return "Invalid Domain Registrar";
+                    return _('Invalid Domain Registrar');
 
                 }
 
@@ -323,7 +335,7 @@ class DomainQueue
 
                 } else {
 
-                    if ($domain_status == 'invalid') {
+                    if ($domain_status == strtolower(_('Invalid'))) {
 
                         $this->markInvalidDomain($row->id);
 
@@ -342,7 +354,7 @@ class DomainQueue
 
         $this->copyToHistoryDomain();
 
-        return 'Domain Queue Processed<BR>';
+        return _('Domain Queue Processed') . '<BR>';
     }
 
     public function getQueueList()
@@ -506,7 +518,7 @@ class DomainQueue
         // If the DNS Profile doesn't exist create a new one
         if ($has_match != '1') {
 
-            $new_servers = '';
+            $new_servers = array();
             $count = 0;
 
             // Make sure DNS servers were returned
@@ -664,7 +676,7 @@ class DomainQueue
         $result = $pdo->query("
             SELECT id
             FROM categories
-            WHERE `name` = '[created by queue]'
+            WHERE `name` = '" . _('[created by queue]') . "'
             ORDER BY update_time DESC, insert_time DESC
             LIMIT 1")->fetchColumn();
 
@@ -676,7 +688,7 @@ class DomainQueue
                 INSERT INTO categories
                 (`name`, stakeholder, creation_type_id, created_by, insert_time)
                 VALUES
-                ('[created by queue]', '[created by queue]', :creation_type_id, :created_by, :insert_time)");
+                ('" . _('[created by queue]') . "', '" . _('[created by queue]') . "', :creation_type_id, :created_by, :insert_time)");
             $stmt->bindValue('creation_type_id', $creation_type_id, \PDO::PARAM_INT);
             $stmt->bindValue('created_by', $created_by, \PDO::PARAM_INT);
             $bind_timestamp = $this->time->stamp();
@@ -710,7 +722,7 @@ class DomainQueue
         $result = $pdo->query("
             SELECT id
             FROM hosting
-            WHERE `name` = '[created by queue]'
+            WHERE `name` = '" . _('[created by queue]') . "'
             ORDER BY update_time DESC, insert_time DESC
             LIMIT 1")->fetchColumn();
 
@@ -1252,7 +1264,7 @@ class DomainQueue
             SET processing = '0'
             WHERE processing = '1'");
 
-        return 'Queue Processing Cleared<BR>';
+        return _('Queue Processing Cleared') . '<BR>';
     }
 
     public function clearQueues()
@@ -1263,7 +1275,7 @@ class DomainQueue
 
         $pdo->query("DELETE FROM domain_queue");
 
-        return 'Queues Cleared<BR>';
+        return _('Queues Cleared') . '<BR>';
     }
     
     public function checkListQueue()

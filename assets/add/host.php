@@ -3,7 +3,7 @@
  * /assets/add/host.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -33,6 +33,7 @@ $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
 $sanitize = new DomainMOD\Sanitize();
 $unsanitize = new DomainMOD\Unsanitize();
+$validate = new DomainMOD\Validate();
 
 require_once DIR_INC . '/head.inc.php';
 require_once DIR_INC . '/debug.inc.php';
@@ -47,7 +48,7 @@ $new_notes = $sanitize->text($_POST['new_notes']);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    if ($new_host != "") {
+    if ($validate->text($new_host)) {
 
         $pdo = $deeb->cnxx;
 
@@ -64,14 +65,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bindValue('timestamp', $timestamp, PDO::PARAM_STR);
         $stmt->execute();
 
-        $_SESSION['s_message_success'] .= "Web Host " . $new_host . " Added<BR>";
+        $_SESSION['s_message_success'] .= sprintf(_('Web Host %s added'), $new_host) . '<BR>';
 
         header("Location: ../hosting.php");
         exit;
 
     } else {
 
-        if ($new_host == "") $_SESSION['s_message_danger'] .= "Enter the web host's name<BR>";
+        if (!$validate->text($new_host)) $_SESSION['s_message_danger'] .= _("Enter the Web Host's name") . '<BR>';
 
     }
 
@@ -83,14 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 echo $form->showFormTop('');
-echo $form->showInputText('new_host', 'Web Host Name (100)', '', $unsanitize->text($new_host), '100', '', '1', '', '');
-echo $form->showInputText('new_url', 'Web Host\'s URL (100)', '', $unsanitize->text($new_url), '100', '', '', '', '');
-echo $form->showInputTextarea('new_notes', 'Notes', '', $unsanitize->text($new_notes), '', '', '');
-echo $form->showSubmitButton('Add Web Host', '', '');
+echo $form->showInputText('new_host', _('Web Host Name') . ' (100)', '', $unsanitize->text($new_host), '100', '', '1', '', '');
+echo $form->showInputText('new_url', _("Web Host's URL") . ' (100)', '', $unsanitize->text($new_url), '100', '', '', '', '');
+echo $form->showInputTextarea('new_notes', _('Notes'), '', $unsanitize->text($new_notes), '', '', '');
+echo $form->showSubmitButton(_('Add Web Host'), '', '');
 echo $form->showFormBottom('');
 ?>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>

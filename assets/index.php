@@ -3,7 +3,7 @@
  * /assets/index.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -41,23 +41,39 @@ $system->authCheck();
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
-<h3>Domains</h3>
-<a href="registrars.php">Domain Registrars</a><BR>
-<a href="registrar-accounts.php">Domain Registrar Accounts</a><BR>
-<a href="dns.php">DNS Profiles</a><BR>
-<a href="hosting.php">Web Hosting Providers</a>
 
-<h3>SSL Certificates</h3>
-<a href="ssl-providers.php">SSL Providers</a><BR>
-<a href="ssl-accounts.php">SSL Provider Accounts</a><BR>
-<a href="ssl-types.php">SSL Certificate Types</a>
+<?php echo _('Assets are the building blocks of DomainMOD.'); ?>&nbsp;<?php echo _('Assets include things like the domain registrars and accounts that you use, the SSL certificate types that you own, your DNS Servers and IP Addresses, the categories you want to use for grouping similar domains, and so on.'); ?><BR>
+<BR>
 
-<h3>Shared</h3>
-<a href="account-owners.php">Account Owners</a><BR>
-<a href="categories.php">Categories</a><BR>
-<a href="ip-addresses.php">IP Addresses</a><BR><BR>
+<div class="row">
+    <?php echo $layout->contentBoxTop(_('Domains'), '3'); ?>
+    <a href="registrars.php"><?php echo _('Domain Registrars'); ?></a><BR>
+    <a href="registrar-accounts.php"><?php echo _('Domain Registrar Accounts'); ?></a><BR>
+    <a href="dns.php"><?php echo _('DNS Profiles'); ?></a><BR>
+    <a href="hosting.php"><?php echo _('Web Hosting Providers'); ?></a>
+    <?php echo $layout->contentBoxBottom(); ?>
+
+    <?php echo $layout->contentBoxTop(_('SSL Certificates'), '3'); ?>
+    <a href="ssl-providers.php"><?php echo _('SSL Providers'); ?></a><BR>
+    <a href="ssl-accounts.php"><?php echo _('SSL Provider Accounts'); ?></a><BR>
+    <a href="ssl-types.php"><?php echo _('SSL Certificate Types'); ?></a><BR>
+    &nbsp;
+    <?php echo $layout->contentBoxBottom(); ?>
+
+    <?php echo $layout->contentBoxTop(_('Shared'), '3'); ?>
+    <a href="account-owners.php"><?php echo _('Account Owners'); ?></a><BR>
+    <a href="categories.php"><?php echo _('Categories'); ?></a><BR>
+    <a href="ip-addresses.php"><?php echo _('IP Addresses'); ?></a><BR>
+    &nbsp;
+    <?php echo $layout->contentBoxBottom(); ?>
+
+    <div class="col-md-3">
+        &nbsp;
+    </div>
+</div>
+
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
 </body>
 </html>

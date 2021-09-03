@@ -3,7 +3,7 @@
  * /_includes/layout/date-range-picker-footer.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -19,26 +19,26 @@
  *
  */
 ?>
-<script type="text/javascript" src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/daterangepicker/moment.min.js"></script>
+<script type="text/javascript" src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/moment/moment.min.js"></script>
 <script type="text/javascript" src="<?php echo $web_root . '/' . WEBROOT_THEME; ?>/plugins/daterangepicker/daterangepicker.js"></script>
-<script type="text/javascript">
-$(function() {
+<script nonce="<?php echo CURRENT_NONCE; ?>">
+    $(function() {
 
-  $('input[name="daterange"]').daterangepicker({
-      autoUpdateInput: false,
-      locale: {
-          format: 'YYYY-MM-DD',
-          cancelLabel: 'Clear'
-      }
-  });
+        $('input[name="daterange"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                format: 'YYYY-MM-DD',
+                cancelLabel: 'Clear'
+            }
+        });
 
-  $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
-      $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
-  });
+        $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+        });
 
-  $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
-      $(this).val('');
-  });
+        $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
 
-});
+    });
 </script>

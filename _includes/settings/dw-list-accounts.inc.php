@@ -3,7 +3,7 @@
  * /_includes/settings/dw-list-accounts.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -22,20 +22,17 @@
 <?php
 if ($_SESSION['s_dw_view_all'] == "1") {
 
-    $page_title = "Listing All Server Accounts";
+    $page_title = _('Listing All Server Accounts');
 
 } else {
 
-    $page_title = 'Listing Server Accounts on ' . $_SESSION['s_dw_server_name'] . ' (' . $_SESSION['s_dw_server_host'] . ')';
+    $page_title = sprintf(_('Listing Server Accounts on %s (%s)'), $_SESSION['s_dw_server_name'], $_SESSION['s_dw_server_host']);
 
 }
-$breadcrumb = "Accounts";
+$breadcrumb = _('Accounts');
 $software_section = "dw";
 $software_section_logo = "fa-database";
 $slug = "dw-list-accounts";
-$datatable_css = '#' . $slug . ' thead th { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }
-                  #' . $slug . ' tbody tr:hover { background-color: #ffffff; }
-                  #' . $slug . ' tbody td { padding: 2px 0px 2px 6px; border: 0; white-space: nowrap; }';
 $datatable_class = 'table table-striped dt-responsive cell-border compact';
 $datatable_options = 'var oldStart = 0;
                       $(\'#' . $slug . '\').DataTable({

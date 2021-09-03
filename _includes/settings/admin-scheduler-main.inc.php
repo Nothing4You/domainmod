@@ -3,7 +3,7 @@
  * /_includes/settings/admin-scheduler-main.inc.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -20,44 +20,8 @@
  */
 ?>
 <?php
-$page_title = "Task Scheduler";
-$breadcrumb = "Scheduler";
+$page_title = _('Task Scheduler');
+$breadcrumb = _('Scheduler');
 $software_section = "admin";
 $software_section_logo = "fa-wrench";
 $slug = "admin-scheduler-main";
-$datatable_css = '#' . $slug . ' thead th { padding: 2px 0px 2px 2px; border: 0; }
-                  #' . $slug . ' tbody tr:hover { background-color: #dddddd; }
-                  #' . $slug . ' tbody td { padding: 2px 0px 2px 2px; border: 0; }';
-$datatable_class = 'table table-striped dt-responsive cell-border compact';
-$datatable_options = 'var oldStart = 0;
-                      $(\'#' . $slug . '\').DataTable({
-                          "paging": false,
-                          "lengthChange": false,
-                          "lengthMenu": [ [25, 50, 75, 100, -1], [25, 50, 75, 100, "All"] ],
-                          "searching": false,
-                          "info": false,
-                          "autoWidth": true,
-                          "bAutoWidth": false,
-                          "responsive": true
-                          "responsive": {
-                               details: {
-                                         type: "column"
-                                        }
-                                        },
-                          "columnDefs": [ {
-                                           className: "control",
-                                           orderable: false,
-                                           targets:   0
-                                           } ],
-                          "ordering": true,
-                          "order": [[ 1, "asc" ]],
-                          "bSortClasses": false,
-                          "dom": \'<"top"lif>rt<"bottom"ip><"clear">\',
-                          "fnDrawCallback": function (o) {
-                            if ( o._iDisplayStart != oldStart ) {
-                                var targetOffset = $("#' . $slug . '").offset().top;
-                                $("html,body").animate({scrollTop: targetOffset}, 0);
-                                oldStart = o._iDisplayStart;
-                            }
-                          }
-                      });';

@@ -3,7 +3,7 @@
  * /classes/DomainMOD/Maintenance.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -45,7 +45,7 @@ class Maintenance
         $this->deleteUnusedFees('ssl_fees', 'ssl_certs');
         $this->zeroInvalidIpIds();
 
-        $result_message = 'Maintenance Completed<BR>';
+        $result_message = _('Maintenance Completed') . '<BR>';
 
         return $result_message;
     }

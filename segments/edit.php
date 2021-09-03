@@ -3,7 +3,7 @@
  * /segments/edit.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -46,10 +46,9 @@ require_once DIR_INC . '/settings/segments-edit.inc.php';
 $system->authCheck();
 $pdo = $deeb->cnxx;
 
-$segid = $_GET['segid'];
+$segid = (int) $_GET['segid'];
 
 $del = (int) $_GET['del'];
-$really_del = (int) $_GET['really_del'];
 
 $new_name = $sanitize->text($_POST['new_name']);
 $new_description = $sanitize->text($_POST['new_description']);
@@ -79,23 +78,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if ($invalid_count == 1) {
 
-                    $_SESSION['s_message_danger'] .= "There is " . number_format($invalid_count) . " invalid domain
-                        on your list<BR><BR>" . $temp_result_message;
+                    $_SESSION['s_message_danger'] .= sprintf(_('There is %s invalid domain on your list'), number_format($invalid_count)) . '<BR><BR>' . $temp_result_message;
 
                 } else {
 
-                    $_SESSION['s_message_danger'] .= "There are " . number_format($invalid_count) . " invalid
-                        domains on your list<BR><BR>" . $temp_result_message;
+                    $_SESSION['s_message_danger'] .= sprintf(_('There are %s invalid domains on your list'), number_format($invalid_count)) . '<BR><BR>' . $temp_result_message;
 
                     if (($invalid_count - $invalid_to_display) == 1) {
 
-                        $_SESSION['s_message_danger'] .= "<BR>Plus " .
-                            number_format($invalid_count - $invalid_to_display) . " other<BR>";
+                        $_SESSION['s_message_danger'] .= '<BR>' . sprintf(_('Plus %s other'), number_format($invalid_count - $invalid_to_display)) . '<BR>';
 
                     } elseif (($invalid_count - $invalid_to_display) > 1) {
 
-                        $_SESSION['s_message_danger'] .= "<BR>Plus " .
-                            number_format($invalid_count - $invalid_to_display) . " others<BR>";
+                        $_SESSION['s_message_danger'] .= '<BR>' . sprintf(_('Plus %s others'), number_format($invalid_count - $invalid_to_display)) . '<BR>';
+
                     }
 
                 }
@@ -114,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 foreach ($domain_array as $key => $new_domain) {
 
                     if (!$domain->checkFormat($new_domain)) {
-                        echo 'invalid domain ' . $key;
+                        echo _('invalid domain') . ' ' . $key;
                         exit;
                     }
 
@@ -140,25 +136,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt->bindValue('segid', $segid, PDO::PARAM_INT);
                 $stmt->execute();
 
+                // Delete domains that have been removed from the segment
                 $stmt = $pdo->prepare("
                     DELETE FROM segment_data
-                    WHERE segment_id = :new_segid");
+                    WHERE segment_id = :new_segid
+                      AND domain NOT IN (" . $new_data_formatted . ")");
                 $stmt->bindValue('new_segid', $new_segid, PDO::PARAM_INT);
                 $stmt->execute();
 
+                // Get the old segment domains
+                $stmt = $pdo->prepare("
+                    SELECT domain
+                    FROM segment_data
+                    WHERE segment_id = :new_segid");
+                $stmt->bindValue('new_segid', $new_segid, PDO::PARAM_INT);
+                $stmt->execute();
+                $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+                // Find the domains that need updating (ie. they're in both the old segment as well as the new segment)
+                $common_domains = array_intersect($domain_array, $result);
+                $common_domains_formatted = $format->formatForMysql($common_domains);
+
+                // Update domains that were already in the segment
+                $stmt = $pdo->prepare("
+                        UPDATE segment_data
+                        SET update_time = :timestamp
+                        WHERE segment_id = :new_segid
+                          AND domain IN (" . $common_domains_formatted . ")");
+                $stmt->bindValue('timestamp', $timestamp, PDO::PARAM_STR);
+                $stmt->bindValue('new_segid', $new_segid, PDO::PARAM_INT);
+                $stmt->execute();
+
+                // Find the domains that need inserting (ie. they don't exist in the old segment)
+                $new_domains = array_diff($domain_array, $result);
+
                 $stmt = $pdo->prepare("
                     INSERT INTO segment_data
-                    (segment_id, domain, update_time)
+                    (segment_id, domain, insert_time)
                     VALUES
                     (:new_segid, :domain, :timestamp)");
                 $stmt->bindValue('new_segid', $new_segid, PDO::PARAM_INT);
-                $stmt->bindParam('domain', $bind_domain, PDO::PARAM_STR);
+                $stmt->bindParam('domain', $bind_new_domain, PDO::PARAM_STR);
                 $stmt->bindValue('timestamp', $timestamp, PDO::PARAM_STR);
 
-                foreach ($domain_array as $domain) {
+                foreach ($new_domains as $bind_new_domain) {
 
-                    $bind_domain = $domain;
-                    $stmt->execute();
+                        // Insert domains that were not already in the segment
+                        $stmt->execute();
 
                 }
 
@@ -168,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 $pdo->commit();
 
-                $_SESSION['s_message_success'] .= "Segment " . $new_name . " Updated<BR>";
+                $_SESSION['s_message_success'] .= sprintf(_('Segment %s update'), $new_name) . '<BR>';
 
                 header("Location: ../segments/");
                 exit;
@@ -191,8 +215,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     } else {
 
-        if ($new_name == "") $_SESSION['s_message_danger'] .= "Enter the segment name<BR>";
-        if ($raw_domain_list == "") $_SESSION['s_message_danger'] .= "Enter the segment<BR>";
+        if ($new_name == "") $_SESSION['s_message_danger'] .= _('Enter the Segment name') . '<BR>';
+        if ($raw_domain_list == "") $_SESSION['s_message_danger'] .= _('Enter the Segment') . '<BR>';
 
     }
 
@@ -225,13 +249,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($del === 1) {
 
-    $_SESSION['s_message_danger'] .= "Are you sure you want to delete this Segment?<BR><BR><a
-        href=\"edit.php?segid=" . $segid . "&really_del=1\">YES, REALLY DELETE THIS SEGMENT</a><BR>";
-
-}
-
-if ($really_del === 1) {
-
     try {
 
         $pdo->beginTransaction();
@@ -253,7 +270,7 @@ if ($really_del === 1) {
 
         $pdo->commit();
 
-        $_SESSION['s_message_success'] .= "Segment " . $temp_segment_name . " Deleted<BR>";
+        $_SESSION['s_message_success'] .= sprintf(_('Segment %s deleted'), $temp_segment_name) . '<BR>';
 
         header("Location: ../segments/");
         exit;
@@ -280,19 +297,19 @@ if ($really_del === 1) {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 echo $form->showFormTop('');
-echo $form->showInputText('new_name', 'Segment Name (35)', '', $unsanitize->text($new_name), '35', '', '1', '', '');
-echo $form->showInputTextarea('raw_domain_list', 'Segment Domains (one per line)', '', $unsanitize->text($raw_domain_list), '1', '', '');
-echo $form->showInputTextarea('new_description', 'Description', '', $unsanitize->text($new_description), '', '', '');
-echo $form->showInputTextarea('new_notes', 'Notes', '', $unsanitize->text($new_notes), '', '', '');
+echo $form->showInputText('new_name', _('Segment Name') . ' (35)', '', $unsanitize->text($new_name), '35', '', '1', '', '');
+echo $form->showInputTextarea('raw_domain_list', _('Segment Domains (one per line)'), '', $unsanitize->text($raw_domain_list), '1', '', '');
+echo $form->showInputTextarea('new_description', _('Description'), '', $unsanitize->text($new_description), '', '', '');
+echo $form->showInputTextarea('new_notes', _('Notes'), '', $unsanitize->text($new_notes), '', '', '');
 echo $form->showInputHidden('new_segid', $segid);
-echo $form->showSubmitButton('Update Segment', '', '');
+echo $form->showSubmitButton(_('Update Segment'), '', '');
 echo $form->showFormBottom('');
+$layout->deleteButton(_('Segment'), $new_name, 'edit.php?segid=' . $segid . '&del=1');
 ?>
-<BR><a href="edit.php?segid=<?php echo urlencode($segid); ?>&del=1">DELETE THIS SEGMENT</a>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
 </body>
 </html>

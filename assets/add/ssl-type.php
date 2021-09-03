@@ -3,7 +3,7 @@
  * /assets/add/ssl-type.php
  *
  * This file is part of DomainMOD, an open source domain and internet asset manager.
- * Copyright (c) 2010-2019 Greg Chetcuti <greg@chetcuti.com>
+ * Copyright (c) 2010-2021 Greg Chetcuti <greg@chetcuti.com>
  *
  * Project: http://domainmod.org   Author: http://chetcuti.com
  *
@@ -33,6 +33,7 @@ $time = new DomainMOD\Time();
 $form = new DomainMOD\Form();
 $sanitize = new DomainMOD\Sanitize();
 $unsanitize = new DomainMOD\Unsanitize();
+$validate = new DomainMOD\Validate();
 
 require_once DIR_INC . '/head.inc.php';
 require_once DIR_INC . '/debug.inc.php';
@@ -46,7 +47,7 @@ $new_notes = $sanitize->text($_POST['new_notes']);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    if ($new_type != "") {
+    if ($validate->text($new_type)) {
 
         $pdo = $deeb->cnxx;
 
@@ -62,14 +63,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bindValue('insert_time', $timestamp, PDO::PARAM_STR);
         $stmt->execute();
 
-        $_SESSION['s_message_success'] .= "SSL Type " . $new_type . " Added<BR>";
+        $_SESSION['s_message_success'] .= sprintf(_('SSL Type %s added'), '<strong>' . $new_type . '</strong>') . '<BR>';
 
         header("Location: ../ssl-types.php");
         exit;
 
     } else {
 
-        $_SESSION['s_message_danger'] .= "Enter the SSL Type<BR>";
+        $_SESSION['s_message_danger'] .= _('Enter the SSL Type') . '<BR>';
 
     }
 
@@ -81,13 +82,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title><?php echo $layout->pageTitle($page_title); ?></title>
     <?php require_once DIR_INC . '/layout/head-tags.inc.php'; ?>
 </head>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed text-sm select2-red<?php echo $layout->bodyDarkMode(); ?>">
 <?php require_once DIR_INC . '/layout/header.inc.php'; ?>
 <?php
 echo $form->showFormTop('');
-echo $form->showInputText('new_type', 'Type (100)', '', $unsanitize->text($new_type), '100', '', '1', '', '');
-echo $form->showInputTextarea('new_notes', 'Notes', '', $unsanitize->text($new_notes), '', '', '');
-echo $form->showSubmitButton('Add SSL Type', '', '');
+echo $form->showInputText('new_type', _('Type') . ' (100)', '', $unsanitize->text($new_type), '100', '', '1', '', '');
+echo $form->showInputTextarea('new_notes', _('Notes'), '', $unsanitize->text($new_notes), '', '', '');
+echo $form->showSubmitButton(_('Add SSL Type'), '', '');
 echo $form->showFormBottom('');
 ?>
 <?php require_once DIR_INC . '/layout/footer.inc.php'; ?>
